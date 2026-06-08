@@ -250,6 +250,7 @@ def nueva_escuela():
             localidad
         )
         VALUES (%s, %s, %s)
+        RETURNING id
         """, (
             nombre,
             numero,
