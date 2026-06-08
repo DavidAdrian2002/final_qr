@@ -278,7 +278,7 @@ def nueva_escuela():
             localidad
         ))
 
-        escuela_id = cursor.lastrowid
+        escuela_id = cursor.fetchone()["id"]
 
         # Asociar docente
         cursor.execute("""
