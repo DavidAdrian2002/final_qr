@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Nuevo Alumno
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Nuevo Alumno
+</h1>
+
+<form
+    method="POST"
+    class="auth-form"
+    enctype="multipart/form-data"
+>
+
+    <input
+        type="text"
+        name="nombre"
+        placeholder="Nombre"
+        required
+    >
+
+    <input
+        type="text"
+        name="apellido"
+        placeholder="Apellido"
+        required
+    >
+
+    <input
+        type="text"
+        name="dni"
+        placeholder="DNI"
+    >
+
+    <select name="sexo" required>
+
+        <option value="">
+            Sexo
+        </option>
+
+        <option value="Varón">
+            Varón
+        </option>
+
+        <option value="Mujer">
+            Mujer
+        </option>
+
+    </select>
+
+    <select name="grado_id" required>
+
+        <option value="">
+            Seleccionar grado
+        </option>
+
+        {% for grado in grados %}
+
+        <option value="{{ grado.id }}">
+            {{ grado.escuela_nombre }}
+            - {{ grado.nombre }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <input
+        type="file"
+        name="foto"
+        accept="image/*"
+    >
+
+    <button type="submit">
+        Crear Alumno
+    </button>
+
+</form>
+
+{% endblock %}

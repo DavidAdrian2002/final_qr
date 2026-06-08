@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+Alumnos
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1 class="page-title">
+        Alumnos
+    </h1>
+
+    <a class="primary-btn" href="/alumnos/nuevo">
+        + Nuevo Alumno
+    </a>
+
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-box">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="student-grid">
+
+    {% for alumno in alumnos %}
+
+    <div class="student-card">
+
+        {% if alumno.foto %}
+
+        <img
+            src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
+            class="student-photo"
+        >
+
+        {% else %}
+
+        <div class="student-photo placeholder">
+            👤
+        </div>
+
+        {% endif %}
+
+        <h2>
+            {{ alumno.apellido }},
+            {{ alumno.nombre }}
+        </h2>
+
+        <p>
+            {{ alumno.grado_nombre }}
+        </p>
+
+        <p>
+            {{ alumno.escuela_nombre }}
+        </p>
+
+        <p>
+            Sexo:
+            {{ alumno.sexo }}
+            
+        </p>
+        <div class="student-actions">
+
+    <a
+        class="primary-btn"
+        href="/alumnos/qr/{{ alumno.id }}"
+    >
+        Ver QR
+    </a>
+
+    <a
+        class="delete-btn"
+        href="/alumnos/desactivar/{{ alumno.id }}"
+    >
+        Desactivar
+    </a>
+
+</div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

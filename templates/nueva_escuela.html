@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+Nueva Escuela
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Nueva Escuela
+</h1>
+
+<form method="POST" class="auth-form">
+
+    <input
+        type="text"
+        name="nombre"
+        placeholder="Nombre de escuela"
+        required
+    >
+
+    <input
+        type="text"
+        name="numero"
+        placeholder="Número"
+    >
+
+    <input
+        type="text"
+        name="localidad"
+        placeholder="Localidad"
+    >
+
+    <button type="submit">
+        Crear Escuela
+    </button>
+
+</form>
+
+{% endblock %}

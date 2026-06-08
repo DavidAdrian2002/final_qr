@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reportes
+{% endblock %}
+
+{% block content %}
+
+<div class="report-page">
+
+    <h1 class="page-title">
+        Reportes Mensuales
+    </h1>
+
+    <div class="report-card">
+
+        <form
+            method="POST"
+            action="/reportes/generar"
+        >
+
+            <div class="form-group">
+
+                <label>
+                    Grado
+                </label>
+
+                <select
+                    name="grado_id"
+                    required
+                >
+
+                    {% for grado in grados %}
+
+                    <option value="{{ grado.id }}">
+
+                        {{ grado.escuela_nombre }}
+                        -
+                        {{ grado.nombre }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Mes
+                </label>
+
+                <input
+                    type="month"
+                    name="mes"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Días hábiles
+                </label>
+
+                <input
+                    type="number"
+                    name="dias_habiles"
+                    min="1"
+                    required
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Generar Reporte
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

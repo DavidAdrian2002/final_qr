@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+QR Alumno
+{% endblock %}
+
+{% block content %}
+
+<div class="qr-container">
+
+    <h1>
+        {{ alumno.apellido }},
+        {{ alumno.nombre }}
+    </h1>
+
+    <p>
+        QR Permanente del Alumno
+    </p>
+
+    <img
+        class="qr-image"
+        src="{{ url_for(
+            'static',
+            filename='qr/' + alumno.qr_token + '.png'
+        ) }}"
+    >
+
+    <div class="qr-buttons">
+
+        <a
+            class="primary-btn"
+            href="/alumnos/qr/descargar/{{ alumno.id }}"
+        >
+            Descargar QR
+        </a>
+
+        <a
+            class="secondary-btn"
+            href="/alumnos"
+        >
+            Volver
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

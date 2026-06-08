@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+Escuelas
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1 class="page-title">
+        Escuelas
+    </h1>
+
+    <a class="primary-btn" href="/escuelas/nueva">
+        + Nueva Escuela
+    </a>
+
+</div>
+
+{% if escuelas %}
+
+<div class="school-list">
+
+    {% for escuela in escuelas %}
+
+    <div class="school-card">
+
+        <h2>
+            {{ escuela.nombre }}
+        </h2>
+
+        <p>
+            Número:
+            {{ escuela.numero or "Sin número" }}
+        </p>
+
+        <p>
+            Localidad:
+            {{ escuela.localidad or "Sin localidad" }}
+        </p>
+
+        <a
+            class="delete-btn"
+            href="/escuelas/eliminar/{{ escuela.id }}"
+        >
+            Eliminar
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<p>
+    No hay escuelas registradas.
+</p>
+
+{% endif %}
+
+{% endblock %}

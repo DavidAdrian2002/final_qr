@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+QR Grado
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    QR del Grado
+</h1>
+
+<div style="margin-bottom:20px;">
+
+    <a
+        class="primary-btn"
+        href="/qr/pdf/{{ alumnos[0].grado_id }}"
+    >
+        Descargar PDF
+    </a>
+
+</div>
+
+<div class="qr-grid">
+
+    {% for alumno in alumnos %}
+
+    <div class="qr-card">
+
+        <img
+            class="qr-small"
+            src="{{ url_for(
+                'static',
+                filename='qr/' + alumno.qr_token + '.png'
+            ) }}"
+        >
+
+        <p>
+            {{ alumno.apellido }},
+            {{ alumno.nombre }}
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

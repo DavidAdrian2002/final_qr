@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+Generar QR
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Generar QR por Grado
+</h1>
+
+<div class="school-list">
+
+    {% for grado in grados %}
+
+    <div class="school-card">
+
+        <h2>
+            {{ grado.escuela_nombre }}
+        </h2>
+
+        <p>
+            {{ grado.nombre }}
+        </p>
+
+        <a
+            class="primary-btn"
+            href="/qr/grado/{{ grado.id }}"
+        >
+            Ver QR
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

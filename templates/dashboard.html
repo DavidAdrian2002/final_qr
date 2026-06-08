@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+Panel Principal
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Panel Principal
+</h1>
+
+<div class="menu-grid">
+
+    <a class="menu-card" href="/escuelas">
+        🏫
+        <span>Escuelas</span>
+    </a>
+
+    <a class="menu-card" href="/grados">
+        🎓
+        <span>Grados</span>
+    </a>
+
+    <a class="menu-card" href="/alumnos">
+        👨‍🎓
+        <span>Alumnos</span>
+    </a>
+
+    <a class="menu-card" href="/asistencia">
+        📷
+        <span>Tomar Asistencia</span>
+    </a>
+
+    <a class="menu-card" href="/qr">
+        🧾
+        <span>Generar QR</span>
+    </a>
+
+    <a
+    class="menu-card"
+    href="/reportes"
+>
+
+    <h2>Reportes</h2>
+
+    <p>
+        Reportes automáticos
+    </p>
+
+</a>
+
+    <a class="menu-card" href="/historial">
+        🕓
+        <span>Historial</span>
+    </a>
+
+    <a class="menu-card" href="/logout">
+        🚪
+        <span>Cerrar Sesión</span>
+    </a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Grados
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1 class="page-title">
+        Grados
+    </h1>
+
+    <a class="primary-btn" href="/grados/nuevo">
+        + Nuevo Grado
+    </a>
+
+</div>
+
+{% if grados %}
+
+<div class="school-list">
+
+    {% for grado in grados %}
+
+    <div class="school-card">
+
+        <h2>
+            {{ grado.nombre }}
+        </h2>
+
+        <p>
+            Escuela:
+            {{ grado.escuela_nombre }}
+        </p>
+
+        <a
+            class="delete-btn"
+            href="/grados/eliminar/{{ grado.id }}"
+        >
+            Eliminar
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<p>
+    No hay grados registrados.
+</p>
+
+{% endif %}
+
+{% endblock %}

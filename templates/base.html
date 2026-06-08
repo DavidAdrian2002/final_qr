@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link
+    rel="manifest"
+    href="{{ url_for('static', filename='manifest.json') }}"
+>
+<meta
+    name="theme-color"
+    content="#2563eb"
+>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+<body>
+
+    {% if session.get("docente_id") %}
+
+    <header class="topbar">
+
+        <div class="logo">
+            Asistencia QR
+        </div>
+
+        <div class="user-info">
+            {{ session["docente_nombre"] }}
+        </div>
+
+    </header>
+
+    {% endif %}
+
+    <main class="container">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+<script>
+
+if ("serviceWorker" in navigator) {
+
+    navigator.serviceWorker.register(
+        "/static/js/service-worker.js"
+    )
+
+}
+
+</script>
+</body>
+</html>

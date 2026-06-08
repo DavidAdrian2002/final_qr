@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}
+Escanear QR
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Escanear QR
+</h1>
+
+<div class="scanner-container">
+
+    <div id="reader"></div>
+
+    <div id="scan-overlay">
+
+        <div class="scan-line"></div>
+
+    </div>
+
+</div>
+
+<div class="scan-buttons">
+
+    <button onclick="modoPresente()">
+        Modo Presente
+    </button>
+
+    <button onclick="modoDemora()">
+        Modo Demora
+    </button>
+
+</div>
+
+<h2 id="modo-texto">
+    Estado actual: Presente
+</h2>
+
+<hr>
+
+<div id="lista"></div>
+
+<br>
+
+<a
+    class="primary-btn"
+    href="/asistencia/cerrar/{{ grado_id }}"
+>
+    Cerrar Asistencia
+</a>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+
+let estadoActual = "Presente"
+
+let escaneoActivo = true
+
+let cooldown = false
+
+
+function modoPresente(){
+
+    estadoActual = "Presente"
+
+    document
+        .getElementById("modo-texto")
+        .innerText =
+        "Estado actual: Presente"
+
+}
+
+
+function modoDemora(){
+
+    estadoActual = "Demora"
+
+    document
+        .getElementById("modo-texto")
+        .innerText =
+        "Estado actual: Demora"
+
+}
+
+
+function vibrar(){
+
+    if(navigator.vibrate){
+
+        navigator.vibrate(200)
+
+    }
+
+}
+
+
+function sonidoOK(){
+
+    const audio = new Audio(
+        "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
+    )
+
+    audio.play()
+
+}
+
+
+function efectoEscaneo(){
+
+    const overlay =
+        document.getElementById("scan-overlay")
+
+    overlay.classList.add("scan-success")
+
+    setTimeout(() => {
+
+        overlay.classList.remove("scan-success")
+
+    }, 500)
+
+}
+
+
+function registrar(token){
+
+    if(cooldown) return
+
+    cooldown = true
+
+    setTimeout(() => {
+
+        cooldown = false
+
+    }, 2500)
+
+    const formData = new FormData()
+
+    formData.append("token", token)
+
+    formData.append(
+        "grado_id",
+        "{{ grado_id }}"
+    )
+
+    formData.append(
+        "estado",
+        estadoActual
+    )
+
+    fetch("/asistencia/registrar", {
+
+        method: "POST",
+
+        body: formData
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if(data.error){
+
+            alert(data.error)
+
+            return
+
+        }
+
+        vibrar()
+
+        sonidoOK()
+
+        efectoEscaneo()
+
+        const item =
+            document.createElement("div")
+
+        item.className = "scan-item"
+
+        item.innerHTML = `
+            <strong>
+                ${data.apellido},
+                ${data.nombre}
+            </strong>
+
+            <br>
+
+            ${data.estado}
+            - ${data.hora}
+        `
+
+        document
+            .getElementById("lista")
+            .prepend(item)
+
+    })
+
+}
+
+
+function onScanSuccess(decodedText){
+
+    if(!cooldown){
+
+        registrar(decodedText)
+
+    }
+
+}
+
+
+const html5QrCode =
+    new Html5Qrcode("reader")
+
+
+html5QrCode.start(
+
+    { facingMode: "environment" },
+
+    {
+        fps: 10,
+        qrbox: 250
+    },
+
+    onScanSuccess
+
+)
+
+</script>
+
+{% endblock %}

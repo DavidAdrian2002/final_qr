@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Registro Inicial
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <h1>
+        Registro Inicial
+    </h1>
+
+    <form method="POST" class="auth-form">
+
+        <input
+            type="text"
+            name="nombre"
+            placeholder="Nombre"
+            required
+        >
+
+        <input
+            type="text"
+            name="apellido"
+            placeholder="Apellido"
+            required
+        >
+
+        <input
+            type="text"
+            name="usuario"
+            placeholder="Usuario"
+            required
+        >
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            required
+        >
+
+        <button type="submit">
+            Crear Cuenta
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

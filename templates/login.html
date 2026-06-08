@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <h1>
+        Asistencia QR
+    </h1>
+
+    <p>
+        Iniciar Sesión
+    </p>
+
+    {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form method="POST" class="auth-form">
+
+        <input
+            type="text"
+            name="usuario"
+            placeholder="Usuario"
+            required
+        >
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            required
+        >
+
+        <button type="submit">
+            Ingresar
+        </button>
+<div class="register-link">
+
+    <p>
+        ¿No tienes cuenta?
+    </p>
+
+    <a href="/register">
+        Crear cuenta
+    </a>
+
+</div>
+    </form>
+
+</div>
+
+{% endblock %}

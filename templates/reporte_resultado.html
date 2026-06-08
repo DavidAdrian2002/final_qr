@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reporte
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Reporte Mensual
+</h1>
+
+<div class="report-info">
+
+    <p>
+        Mes:
+        <strong>{{ mes }}</strong>
+    </p>
+
+    <p>
+        Días hábiles:
+        <strong>{{ dias_habiles }}</strong>
+    </p>
+
+</div>
+
+<div class="table-container">
+
+    <table class="report-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Alumno</th>
+                <th>Presentes</th>
+                <th>Demoras</th>
+                <th>Ausentes</th>
+                <th>%</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for item in reporte %}
+
+            <tr>
+
+                <td>
+                    {{ item.apellido }},
+                    {{ item.nombre }}
+                </td>
+
+                <td>
+                    {{ item.presentes }}
+                </td>
+
+                <td>
+                    {{ item.demoras }}
+                </td>
+
+                <td>
+                    {{ item.ausentes }}
+                </td>
+
+                <td>
+                    {{ item.porcentaje }}%
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+<form
+    method="POST"
+    action="/reportes/word"
+>
+
+    <input
+        type="hidden"
+        name="grado_id"
+        value="{{ grado_id }}"
+    >
+
+    <input
+        type="hidden"
+        name="grado_nombre"
+        value="{{ grado_nombre }}"
+    >
+
+    <input
+        type="hidden"
+        name="escuela_nombre"
+        value="{{ escuela_nombre }}"
+    >
+
+    <input
+        type="hidden"
+        name="mes"
+        value="{{ mes }}"
+    >
+
+    <input
+        type="hidden"
+        name="dias_habiles"
+        value="{{ dias_habiles }}"
+    >
+
+    <button
+        class="primary-btn"
+        type="submit"
+    >
+        Descargar Word
+    </button>
+
+</form>
+</div>
+
+{% endblock %}

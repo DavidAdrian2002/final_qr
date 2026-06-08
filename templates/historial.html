@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+Historial
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Historial de Asistencia
+</h1>
+
+<form method="GET" class="auth-form">
+
+    <select name="grado_id" required>
+
+        <option value="">
+            Seleccionar grado
+        </option>
+
+        {% for grado in grados %}
+
+        <option value="{{ grado.id }}">
+            {{ grado.escuela_nombre }}
+            - {{ grado.nombre }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <input
+        type="date"
+        name="fecha"
+        required
+    >
+
+    <button type="submit">
+        Buscar
+    </button>
+
+</form>
+
+{% if asistencias %}
+
+<br>
+
+<a
+    class="primary-btn"
+    href="/historial/pdf?grado_id={{ request.args.get('grado_id') }}&fecha={{ request.args.get('fecha') }}"
+>
+    Descargar PDF
+</a>
+
+<br><br>
+
+<div class="attendance-list">
+
+    {% for item in asistencias %}
+
+    <div class="attendance-card">
+
+        <h2>
+            {{ item.apellido }},
+            {{ item.nombre }}
+        </h2>
+
+        <p>
+            Estado:
+            <strong>
+                {{ item.estado }}
+            </strong>
+        </p>
+
+        <p>
+            Hora:
+            {{ item.hora }}
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

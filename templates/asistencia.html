@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+Tomar Asistencia
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Tomar Asistencia
+</h1>
+
+<form
+    method="POST"
+    action="/asistencia/iniciar"
+    class="auth-form"
+>
+
+    <select name="grado_id" required>
+
+        <option value="">
+            Seleccionar grado
+        </option>
+
+        {% for grado in grados %}
+
+        <option value="{{ grado.id }}">
+            {{ grado.escuela_nombre }}
+            - {{ grado.nombre }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <button type="submit">
+        Iniciar Asistencia
+    </button>
+
+</form>
+
+{% endblock %}
