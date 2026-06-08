@@ -13,7 +13,7 @@ def generar_qr(token):
         f"{token}.png"
     )
 
-    # Evitar regenerar
+    
     if os.path.exists(ruta):
         return ruta
 

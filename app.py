@@ -1432,7 +1432,7 @@ def reporte_word():
 
     grado_id = request.form["grado_id"]
 
-    # Obtener alumnos
+    
     cursor.execute("""
     SELECT *
     FROM alumnos
