@@ -4,6 +4,10 @@ import os
 # DETECTAR ENTORNO
 # =========================
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    print("USANDO POSTGRESQL")
+else:
+    print("USANDO SQLITE")
 
 # =========================
 # POSTGRESQL (RENDER)
