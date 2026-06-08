@@ -6,6 +6,9 @@ from flask import send_file
 from datetime import datetime
 from docx import Document
 from docx.shared import Inches
+from flask import *
+from utils.db import *
+
 from werkzeug.security import (
     generate_password_hash,
     check_password_hash
@@ -42,6 +45,8 @@ from utils.db import init_db, get_connection
 
 app = Flask(__name__)
 
+init_db()
+
 app.secret_key = "super_secret_key"
 
 UPLOAD_FOLDER = "static/img/alumnos"
@@ -50,7 +55,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-init_db()
+
 asistencias_temp = {}
 
 # =========================
@@ -185,34 +190,7 @@ def login():
         error=error
     )
 
-import sqlite3
 
-DATABASE = "database.db"
-
-
-def get_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    # =========================
-    # DOCENTES
-    # =========================
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS docentes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        apellido TEXT NOT NULL,
-        usuario TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    )
-    """)
 
 # =========================
 # ESCUELAS
