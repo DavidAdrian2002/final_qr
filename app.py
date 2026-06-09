@@ -473,7 +473,11 @@ def alumnos():
     WHERE docente_escuelas.docente_id = %s
     AND alumnos.activo = 1
 
-    ORDER BY apellido ASC
+    ORDER BY
+    escuelas.nombre ASC,
+    grados.nombre ASC,
+    alumnos.apellido ASC
+
     """, (session["docente_id"],))
 
     alumnos = cursor.fetchall()

@@ -8,86 +8,116 @@ Alumnos
 
 <div class="page-header">
 
-    <h1 class="page-title">
-        Alumnos
-    </h1>
+```
+<h1 class="page-title">
+    Alumnos
+</h1>
 
-    <a class="primary-btn" href="/alumnos/nuevo">
-        + Nuevo Alumno
-    </a>
+<a class="primary-btn" href="/alumnos/nuevo">
+    + Nuevo Alumno
+</a>
+```
 
 </div>
 
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="success-box">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+{% if messages %}
+{% for message in messages %} <div class="success-box">
+{{ message }} </div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 
-<div class="student-grid">
+{% set escuela_actual = "" %}
+{% set grado_actual = "" %}
 
-    {% for alumno in alumnos %}
+{% for alumno in alumnos %}
 
-    <div class="student-card">
+```
+{% if escuela_actual != alumno.escuela_nombre %}
 
-        {% if alumno.foto %}
+    <div class="section-title">
 
-        <img
-            src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
-            class="student-photo"
-        >
-
-        {% else %}
-
-        <div class="student-photo placeholder">
-            👤
-        </div>
-
-        {% endif %}
-
-        <h2>
-            {{ alumno.apellido }},
-            {{ alumno.nombre }}
+        <h2 class="school-title">
+            🏫 {{ alumno.escuela_nombre }}
         </h2>
-
-        <p>
-            {{ alumno.grado_nombre }}
-        </p>
-
-        <p>
-            {{ alumno.escuela_nombre }}
-        </p>
-
-        <p>
-            Sexo:
-            {{ alumno.sexo }}
-            
-        </p>
-        <div class="student-actions">
-
-    <a
-        class="primary-btn"
-        href="/alumnos/qr/{{ alumno.id }}"
-    >
-        Ver QR
-    </a>
-
-    <a
-        class="delete-btn"
-        href="/alumnos/desactivar/{{ alumno.id }}"
-    >
-        Desactivar
-    </a>
-
-</div>
 
     </div>
 
-    {% endfor %}
+    {% set escuela_actual = alumno.escuela_nombre %}
+    {% set grado_actual = "" %}
+
+{% endif %}
+
+{% if grado_actual != alumno.grado_nombre %}
+
+    <div class="grade-title-container">
+
+        <h3 class="grade-title">
+            📚 {{ alumno.grado_nombre }}
+        </h3>
+
+    </div>
+
+    <div class="student-grid">
+
+    {% set grado_actual = alumno.grado_nombre %}
+
+{% endif %}
+
+<div class="student-card">
+
+    {% if alumno.foto %}
+
+    <img
+        src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
+        class="student-photo"
+    >
+
+    {% else %}
+
+    <div class="student-photo placeholder">
+        👤
+    </div>
+
+    {% endif %}
+
+    <h2>
+        {{ alumno.apellido }},
+        {{ alumno.nombre }}
+    </h2>
+
+    <p>
+        {{ alumno.grado_nombre }}
+    </p>
+
+    <p>
+        Sexo:
+        {{ alumno.sexo }}
+    </p>
+
+    <div class="student-actions">
+
+        <a
+            class="primary-btn"
+            href="/alumnos/qr/{{ alumno.id }}"
+        >
+            Ver QR
+        </a>
+
+        <a
+            class="delete-btn"
+            href="/alumnos/desactivar/{{ alumno.id }}"
+        >
+            Desactivar
+        </a>
+
+    </div>
+
+</div>
+```
+
+{% endfor %}
 
 </div>
 
