@@ -28,12 +28,12 @@ Alumnos
 {% endif %}
 {% endwith %}
 
-{% set escuela_actual = None %}
+{% set ns = namespace(escuela_actual='') %}
 
 {% for alumno in alumnos %}
 
 ```
-{% if escuela_actual != alumno.escuela_nombre %}
+{% if ns.escuela_actual != alumno.escuela_nombre %}
 
     {% if not loop.first %}
         </div>
@@ -47,60 +47,60 @@ Alumnos
 
         <div class="student-grid">
 
-    {% set escuela_actual = alumno.escuela_nombre %}
+    {% set ns.escuela_actual = alumno.escuela_nombre %}
 
 {% endif %}
 
-    <div class="student-card">
+<div class="student-card">
 
-        {% if alumno.foto %}
+    {% if alumno.foto %}
 
-        <img
-            src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
-            class="student-photo"
+    <img
+        src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
+        class="student-photo"
+    >
+
+    {% else %}
+
+    <div class="student-photo placeholder">
+        👤
+    </div>
+
+    {% endif %}
+
+    <h2>
+        {{ alumno.apellido }},
+        {{ alumno.nombre }}
+    </h2>
+
+    <p>
+        📚 {{ alumno.grado_nombre }}
+    </p>
+
+    <p>
+        Sexo:
+        {{ alumno.sexo }}
+    </p>
+
+    <div class="student-actions">
+
+        <a
+            class="primary-btn"
+            href="/alumnos/qr/{{ alumno.id }}"
         >
+            Ver QR
+        </a>
 
-        {% else %}
-
-        <div class="student-photo placeholder">
-            👤
-        </div>
-
-        {% endif %}
-
-        <h2>
-            {{ alumno.apellido }},
-            {{ alumno.nombre }}
-        </h2>
-
-        <p>
-            📚 {{ alumno.grado_nombre }}
-        </p>
-
-        <p>
-            Sexo:
-            {{ alumno.sexo }}
-        </p>
-
-        <div class="student-actions">
-
-            <a
-                class="primary-btn"
-                href="/alumnos/qr/{{ alumno.id }}"
-            >
-                Ver QR
-            </a>
-
-            <a
-                class="delete-btn"
-                href="/alumnos/desactivar/{{ alumno.id }}"
-            >
-                Desactivar
-            </a>
-
-        </div>
+        <a
+            class="delete-btn"
+            href="/alumnos/desactivar/{{ alumno.id }}"
+        >
+            Desactivar
+        </a>
 
     </div>
+
+</div>
 ```
 
 {% endfor %}
