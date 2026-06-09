@@ -8,7 +8,7 @@ Alumnos
 
 <div class="page-header">
 
-```
+
 <h1 class="page-title">
     Alumnos
 </h1>
@@ -16,7 +16,7 @@ Alumnos
 <a class="primary-btn" href="/alumnos/nuevo">
     + Nuevo Alumno
 </a>
-```
+
 
 </div>
 
@@ -32,7 +32,7 @@ Alumnos
 
 {% for alumno in alumnos %}
 
-```
+
 {% if ns.escuela_actual != alumno.escuela_nombre %}
 
     {% if not loop.first %}
@@ -42,7 +42,7 @@ Alumnos
     <div class="school-section">
 
         <h2 class="school-title">
-            🏫 {{ alumno.escuela_nombre }}
+             {{ alumno.escuela_nombre }}
         </h2>
 
         <div class="student-grid">
@@ -74,7 +74,7 @@ Alumnos
     </h2>
 
     <p>
-        📚 {{ alumno.grado_nombre }}
+        {{ alumno.grado_nombre }}
     </p>
 
     <p>
@@ -101,7 +101,7 @@ Alumnos
     </div>
 
 </div>
-```
+
 
 {% endfor %}
 
