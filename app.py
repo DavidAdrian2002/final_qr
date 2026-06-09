@@ -475,8 +475,8 @@ def alumnos():
 
     ORDER BY
     escuelas.nombre ASC,
-    grados.nombre ASC,
     alumnos.apellido ASC
+
 
     """, (session["docente_id"],))
 

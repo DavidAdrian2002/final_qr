@@ -29,39 +29,25 @@ Alumnos
 {% endwith %}
 
 {% set escuela_actual = "" %}
-{% set grado_actual = "" %}
 
 {% for alumno in alumnos %}
 
 ```
 {% if escuela_actual != alumno.escuela_nombre %}
 
-    <div class="section-title">
+    {% if not loop.first %}
+        </div>
+    {% endif %}
+
+    <div class="school-section">
 
         <h2 class="school-title">
             🏫 {{ alumno.escuela_nombre }}
         </h2>
 
-    </div>
+        <div class="student-grid">
 
     {% set escuela_actual = alumno.escuela_nombre %}
-    {% set grado_actual = "" %}
-
-{% endif %}
-
-{% if grado_actual != alumno.grado_nombre %}
-
-    <div class="grade-title-container">
-
-        <h3 class="grade-title">
-            📚 {{ alumno.grado_nombre }}
-        </h3>
-
-    </div>
-
-    <div class="student-grid">
-
-    {% set grado_actual = alumno.grado_nombre %}
 
 {% endif %}
 
@@ -88,7 +74,7 @@ Alumnos
     </h2>
 
     <p>
-        {{ alumno.grado_nombre }}
+        📚 {{ alumno.grado_nombre }}
     </p>
 
     <p>
@@ -119,6 +105,7 @@ Alumnos
 
 {% endfor %}
 
+</div>
 </div>
 
 {% endblock %}
