@@ -28,7 +28,7 @@ Alumnos
 {% endif %}
 {% endwith %}
 
-{% set escuela_actual = "" %}
+{% set escuela_actual = None %}
 
 {% for alumno in alumnos %}
 
@@ -51,61 +51,60 @@ Alumnos
 
 {% endif %}
 
-<div class="student-card">
+    <div class="student-card">
 
-    {% if alumno.foto %}
+        {% if alumno.foto %}
 
-    <img
-        src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
-        class="student-photo"
-    >
-
-    {% else %}
-
-    <div class="student-photo placeholder">
-        👤
-    </div>
-
-    {% endif %}
-
-    <h2>
-        {{ alumno.apellido }},
-        {{ alumno.nombre }}
-    </h2>
-
-    <p>
-        📚 {{ alumno.grado_nombre }}
-    </p>
-
-    <p>
-        Sexo:
-        {{ alumno.sexo }}
-    </p>
-
-    <div class="student-actions">
-
-        <a
-            class="primary-btn"
-            href="/alumnos/qr/{{ alumno.id }}"
+        <img
+            src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
+            class="student-photo"
         >
-            Ver QR
-        </a>
 
-        <a
-            class="delete-btn"
-            href="/alumnos/desactivar/{{ alumno.id }}"
-        >
-            Desactivar
-        </a>
+        {% else %}
+
+        <div class="student-photo placeholder">
+            👤
+        </div>
+
+        {% endif %}
+
+        <h2>
+            {{ alumno.apellido }},
+            {{ alumno.nombre }}
+        </h2>
+
+        <p>
+            📚 {{ alumno.grado_nombre }}
+        </p>
+
+        <p>
+            Sexo:
+            {{ alumno.sexo }}
+        </p>
+
+        <div class="student-actions">
+
+            <a
+                class="primary-btn"
+                href="/alumnos/qr/{{ alumno.id }}"
+            >
+                Ver QR
+            </a>
+
+            <a
+                class="delete-btn"
+                href="/alumnos/desactivar/{{ alumno.id }}"
+            >
+                Desactivar
+            </a>
+
+        </div>
 
     </div>
-
-</div>
 ```
 
 {% endfor %}
 
-</div>
 </div>
 
 {% endblock %}
