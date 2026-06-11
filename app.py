@@ -1385,6 +1385,7 @@ def generar_reporte():
             "porcentaje": porcentaje
 
         })
+    
 
     conn.close()
 

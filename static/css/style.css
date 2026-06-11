@@ -461,3 +461,37 @@ gap: 15px;
 .student-card{
 padding: 18px;
 }
+.back-dashboard{
+margin-bottom: 20px;
+}
+
+.back-dashboard-btn{
+
+display: inline-block;
+
+text-decoration: none;
+
+background: #1e293b;
+
+color: white;
+
+padding: 10px 18px;
+
+border-radius: 10px;
+
+font-weight: 600;
+
+transition: 0.2s;
+
+
+}
+
+.back-dashboard-btn:hover{
+
+
+background: #334155;
+
+transform: translateX(-3px);
+
+
+}
