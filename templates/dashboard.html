@@ -4,6 +4,10 @@
 Panel Principal
 {% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <h1 class="page-title">
@@ -37,18 +41,10 @@ Panel Principal
         <span>Generar QR</span>
     </a>
 
-    <a
-    class="menu-card"
-    href="/reportes"
->
-
-    <h2>Reportes</h2>
-
-    <p>
-        Reportes automáticos
-    </p>
-
-</a>
+    <a class="menu-card" href="/reportes">
+        <h2>Reportes</h2>
+        <p>Reportes automáticos</p>
+    </a>
 
     <a class="menu-card" href="/historial">
         🕓

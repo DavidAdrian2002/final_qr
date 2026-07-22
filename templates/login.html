@@ -4,6 +4,10 @@
 Login
 {% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="auth-container">
@@ -41,17 +45,19 @@ Login
         <button type="submit">
             Ingresar
         </button>
-<div class="register-link">
 
-    <p>
-        ¿No tienes cuenta?
-    </p>
+        <div class="register-link">
 
-    <a href="/register">
-        Crear cuenta
-    </a>
+            <p>
+                ¿No tienes cuenta?
+            </p>
 
-</div>
+            <a href="/register">
+                Crear cuenta
+            </a>
+
+        </div>
+
     </form>
 
 </div>

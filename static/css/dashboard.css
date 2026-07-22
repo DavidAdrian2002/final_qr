@@ -1,0 +1,6 @@
+/* Fondo exclusivo del Dashboard */
+
+body{
+    background: url("../img/fondodash.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
