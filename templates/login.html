@@ -5,55 +5,55 @@ Login
 {% endblock %}
 
 {% block content %}
+<div class="login-wrapper">
+    <div class="auth-container">
 
-<div class="auth-container">
+        <h1>
+            Asistencia QR
+        </h1>
 
-    <h1>
-        Asistencia QR
-    </h1>
+        <p>
+            Iniciar Sesión
+        </p>
 
-    <p>
-        Iniciar Sesión
-    </p>
+        {% if error %}
+            <div class="error-box">
+                {{ error }}
+            </div>
+        {% endif %}
 
-    {% if error %}
-        <div class="error-box">
-            {{ error }}
-        </div>
-    {% endif %}
+        <form method="POST" class="auth-form">
 
-    <form method="POST" class="auth-form">
+            <input
+                type="text"
+                name="usuario"
+                placeholder="Usuario"
+                required
+            >
 
-        <input
-            type="text"
-            name="usuario"
-            placeholder="Usuario"
-            required
-        >
+            <input
+                type="password"
+                name="password"
+                placeholder="Contraseña"
+                required
+            >
 
-        <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            required
-        >
+            <button type="submit">
+                Ingresar
+            </button>
+            <div class="register-link">
 
-        <button type="submit">
-            Ingresar
-        </button>
-<div class="register-link">
+                <p>
+                    ¿No tienes cuenta?
+                </p>
 
-    <p>
-        ¿No tienes cuenta?
-    </p>
+                <a href="/register">
+                    Crear cuenta
+                </a>
 
-    <a href="/register">
-        Crear cuenta
-    </a>
+            </div>
+        </form>
 
+    </div>
 </div>
-    </form>
-
-</div>
-
 {% endblock %}
