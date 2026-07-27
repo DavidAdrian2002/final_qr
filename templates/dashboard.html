@@ -8,7 +8,7 @@ Panel Principal
 <div class="dashboard-wrapper">
 
     <h1 class="page-title">
-        ¡Bienvenido {{ usuario }} al Sistema de control de asistencia SiConAs.QR!
+        ¡Bienvenido {{ usuario|default(session.get('usuario', 'Usuario')) }} al Sistema de control de asistencia SiConAs.QR!
     </h1>
 
     <div class="menu-grid">
