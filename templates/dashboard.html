@@ -5,61 +5,55 @@ Panel Principal
 {% endblock %}
 
 {% block content %}
+<div class="dashboard-wrapper">
 
-<h1 class="page-title">
-    Panel Principal
-</h1>
+    <h1 class="page-title">
+        Panel Principal
+    </h1>
 
-<div class="menu-grid">
+    <div class="menu-grid">
 
-    <a class="menu-card" href="/escuelas">
-        🏫
-        <span>Escuelas</span>
-    </a>
+        <a class="menu-card" href="/escuelas">
+            🏫
+            <span>Escuelas</span>
+        </a>
 
-    <a class="menu-card" href="/grados">
-        🎓
-        <span>Grados</span>
-    </a>
+        <a class="menu-card" href="/grados">
+            🎓
+            <span>Grados</span>
+        </a>
 
-    <a class="menu-card" href="/alumnos">
-        👨‍🎓
-        <span>Alumnos</span>
-    </a>
+        <a class="menu-card" href="/alumnos">
+            👨‍🎓
+            <span>Alumnos</span>
+        </a>
 
-    <a class="menu-card" href="/asistencia">
-        📷
-        <span>Tomar Asistencia</span>
-    </a>
+        <a class="menu-card" href="/asistencia">
+            📷
+            <span>Tomar Asistencia</span>
+        </a>
 
-    <a class="menu-card" href="/qr">
-        🧾
-        <span>Generar QR</span>
-    </a>
+        <a class="menu-card" href="/qr">
+            🧾
+            <span>Generar QR</span>
+        </a>
 
-    <a
-    class="menu-card"
-    href="/reportes"
->
+        <a class="menu-card" href="/reportes">
+            <h2>Reportes</h2>
+            <p>Reportes automáticos</p>
+        </a>
 
-    <h2>Reportes</h2>
+        <a class="menu-card" href="/historial">
+            🕓
+            <span>Historial</span>
+        </a>
 
-    <p>
-        Reportes automáticos
-    </p>
+        <a class="menu-card" href="/logout">
+            🚪
+            <span>Cerrar Sesión</span>
+        </a>
 
-</a>
-
-    <a class="menu-card" href="/historial">
-        🕓
-        <span>Historial</span>
-    </a>
-
-    <a class="menu-card" href="/logout">
-        🚪
-        <span>Cerrar Sesión</span>
-    </a>
+    </div>
 
 </div>
-
 {% endblock %}
