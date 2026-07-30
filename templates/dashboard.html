@@ -7,49 +7,52 @@ Panel Principal
 {% block content %}
 <div class="dashboard-wrapper">
 
-    <h1 class="page-title">
-        ¡Bienvenido {{ usuario|default(session.get('usuario', 'Usuario')) }} al Sistema de control de asistencia SiConAs.QR!
-    </h1>
+    <div class="dashboard-header">
+        <h1 class="page-title">
+            ¡Bienvenido <span>{{ usuario|default(session.get('usuario', 'Usuario')) }}</span>!
+        </h1>
+        <p class="page-subtitle">Sistema de Control de Asistencia SiConAs.QR</p>
+    </div>
 
     <div class="menu-grid">
 
         <a class="menu-card" href="/escuelas">
-            🏫
+            <div class="card-icon">🏫</div>
             <span>Escuelas</span>
         </a>
 
         <a class="menu-card" href="/grados">
-            🎓
+            <div class="card-icon">🎓</div>
             <span>Grados</span>
         </a>
 
         <a class="menu-card" href="/alumnos">
-            👨‍🎓
+            <div class="card-icon">👨‍🎓</div>
             <span>Alumnos</span>
         </a>
 
         <a class="menu-card" href="/asistencia">
-            📷
+            <div class="card-icon">📷</div>
             <span>Tomar Asistencia</span>
         </a>
 
         <a class="menu-card" href="/qr">
-            🧾
+            <div class="card-icon">🧾</div>
             <span>Generar QR</span>
         </a>
 
         <a class="menu-card" href="/reportes">
-            <h2>Reportes</h2>
-            <p>Reportes automáticos</p>
+            <div class="card-icon">📊</div>
+            <span>Reportes</span>
         </a>
 
         <a class="menu-card" href="/historial">
-            🕓
+            <div class="card-icon">🕓</div>
             <span>Historial</span>
         </a>
 
-        <a class="menu-card" href="/logout">
-            🚪
+        <a class="menu-card logout-card" href="/logout">
+            <div class="card-icon">🚪</div>
             <span>Cerrar Sesión</span>
         </a>
 

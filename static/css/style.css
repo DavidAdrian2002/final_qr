@@ -1,3 +1,5 @@
+/* Importamos la fuente Inter para un aspecto moderno y limpio */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 *{
     margin:0;
     padding:0;
@@ -8,8 +10,120 @@
 body{
     background:#f4f6f9;
     color:#333;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+}
+/* Wrapper principal con imagen de fondo */
+.dashboard-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    background: url('../img/fondodash.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding: 30px 16px 50px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Encabezado del Dashboard */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 25px;
+    max-width: 500px;
+}
+
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.page-title span {
+    color: #38bdf8; /* Color celestito brillante para resaltar el nombre */
+}
+
+.page-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 400;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Grilla optimizada para Celulares (2 columnas) */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    width: 100%;
+    max-width: 480px; /* Ancho máximo estándar de un smartphone */
+}
+
+/* Tarjetas / Botones en estilo Cristal (Glassmorphism) */
+.menu-card {
+    background: rgba(15, 23, 42, 0.65); /* Fondo oscuro con transparencia */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+    
+    /* Evita que el usuario seleccione texto al tocar rápido */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Respuesta táctil inmediata al presionar en el cel */
+.menu-card:active {
+    transform: scale(0.95);
+    background: rgba(30, 41, 59, 0.85);
+}
+
+/* Íconos */
+.card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Texto de cada tarjeta */
+.menu-card span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-align: center;
+}
+
+/* Estilo especial para Cerrar Sesión (ocupa 2 columnas para quedar centrado abajo) */
+.menu-card.logout-card {
+    grid-column: span 2;
+    flex-direction: row;
+    gap: 10px;
+    padding: 14px;
+    background: rgba(225, 29, 72, 0.25); /* Tinte rojizo sutil */
+    border-color: rgba(244, 63, 94, 0.3);
+}
+
+.menu-card.logout-card .card-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0;
+}
+
+.menu-card.logout-card:active {
+    background: rgba(225, 29, 72, 0.45);
+}
 .topbar{
     width:100%;
     background:#2563eb;
