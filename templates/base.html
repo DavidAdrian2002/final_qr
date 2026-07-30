@@ -1,84 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link
-    rel="manifest"
-    href="{{ url_for('static', filename='manifest.json') }}"
->
-<meta
-    name="theme-color"
-    content="#2563eb"
->
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>{% block title %}{% endblock %}</title>
 
-    <title>
-        {% block title %}{% endblock %}
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Librería de Lucide Icons (se puede cargar aquí en el head) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-    lucide.createIcons();
-</script>
-
 </head>
 <body>
 
     {% if session.get("docente_id") %}
-
     <header class="topbar">
-
         <div class="logo">
             Asistencia QR
         </div>
-
         <div class="user-info">
             {{ session["docente_nombre"] }}
         </div>
-
     </header>
-
     {% endif %}
 
     <main class="container">
-     {% if session.get("docente_id") and request.path != "/dashboard" %}
-
-<div class="back-dashboard">
-
-
-<a href="/dashboard" class="back-dashboard-btn">
-    ← Panel Principal
-</a>
-
-
-</div>
-
-{% endif %}
-
-
+        {% if session.get("docente_id") and request.path != "/dashboard" %}
+        <div class="back-dashboard">
+            <a href="/dashboard" class="back-dashboard-btn">
+                ← Panel Principal
+            </a>
+        </div>
+        {% endif %}
 
         {% block content %}
         {% endblock %}
-
     </main>
-<script>
 
-if ("serviceWorker" in navigator) {
+    <!-- Scripts de la aplicación -->
+    <script>
+        // Registrar Service Worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/static/js/service-worker.js");
+        }
 
-    navigator.serviceWorker.register(
-        "/static/js/service-worker.js"
-    )
-
-}
-
-</script>
+        // Inicializar los íconos de Lucide cuando todo el DOM esté cargado
+        document.addEventListener("DOMContentLoaded", function () {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
