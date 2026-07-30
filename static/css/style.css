@@ -18,7 +18,7 @@ html, body {
 body {
     background: #f4f6f9;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #ffffff; /* Aseguramos texto blanco por defecto para los fondos oscuros */
+    color:black; /* Aseguramos texto blanco por defecto para los fondos oscuros */
 }
 
 /* 2. Liberar la clase container para que ocupe todo el ancho */
