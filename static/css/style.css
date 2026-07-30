@@ -334,6 +334,29 @@ body{
     color: #f43f5e;
     border: 1px solid rgba(244, 63, 94, 0.3);
 }
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+/* Ajusta el tamaño de los íconos SVG de Lucide */
+.card-icon i, 
+.card-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke-width: 2px;
+    color: #38bdf8; /* Color celestito coordinado */
+}
+
+/* Ícono de cerrar sesión en color destacado */
+.logout-card .card-icon i,
+.logout-card .card-icon svg {
+    width: 22px;
+    height: 22px;
+    color: #f43f5e;
+}
 .topbar{
     width:100%;
     background:#2563eb;
