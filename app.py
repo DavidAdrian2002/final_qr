@@ -4,6 +4,7 @@ import os
 from utils.qr import generar_qr
 from flask import send_file
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from docx import Document
 from docx.shared import Inches
 from flask import *
@@ -789,7 +790,8 @@ def registrar_asistencia():
             conn.close()
             return {"error": "Alumno ya registrado"}
 
-    hora = datetime.now().strftime("%H:%M:%S")
+    # HORA CORREGIDA PARA ARGENTINA:
+    hora = datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).strftime("%H:%M:%S")
 
     data = {
         "alumno_id": alumno["id"],
