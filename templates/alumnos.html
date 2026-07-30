@@ -5,106 +5,100 @@ Alumnos
 {% endblock %}
 
 {% block content %}
+<div class="alumnos-wrapper">
 
-<div class="page-header">
-
-
-<h1 class="page-title">
-    Alumnos
-</h1>
-
-<a class="primary-btn" href="/alumnos/nuevo">
-    + Nuevo Alumno
-</a>
-
-
-</div>
-
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %} <div class="success-box">
-{{ message }} </div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-{% set ns = namespace(escuela_actual='') %}
-
-{% for alumno in alumnos %}
-
-
-{% if ns.escuela_actual != alumno.escuela_nombre %}
-
-    {% if not loop.first %}
+    <!-- Encabezado de la página -->
+    <div class="page-header">
+        <div class="header-info">
+            <h1 class="page-title">Gestión de Alumnos</h1>
+            <p class="page-subtitle">Listado por establecimiento educativo</p>
         </div>
-    {% endif %}
-
-    <div class="school-section">
-
-        <h2 class="school-title">
-             {{ alumno.escuela_nombre }}
-        </h2>
-
-        <div class="student-grid">
-
-    {% set ns.escuela_actual = alumno.escuela_nombre %}
-
-{% endif %}
-
-<div class="student-card">
-
-    {% if alumno.foto %}
-
-    <img
-        src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
-        class="student-photo"
-    >
-
-    {% else %}
-
-    <div class="student-photo placeholder">
-        👤
+        <a class="primary-btn add-btn" href="/alumnos/nuevo">
+            <span>➕</span> Nuevo Alumno
+        </a>
     </div>
 
+    <!-- Mensajes Flasheados -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %} 
+        <div class="success-box">
+            ✅ {{ message }} 
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% set ns = namespace(escuela_actual='') %}
+
+    {% for alumno in alumnos %}
+
+    {% if ns.escuela_actual != alumno.escuela_nombre %}
+
+        {% if not loop.first %}
+            </div> <!-- Cierre de student-grid anterior -->
+        </div> <!-- Cierre de school-section anterior -->
+        {% endif %}
+
+        <div class="school-section">
+
+            <div class="school-header">
+                <span class="school-icon">🏫</span>
+                <h2 class="school-title">{{ alumno.escuela_nombre }}</h2>
+            </div>
+
+            <div class="student-grid">
+
+        {% set ns.escuela_actual = alumno.escuela_nombre %}
+
     {% endif %}
 
-    <h2>
-        {{ alumno.apellido }},
-        {{ alumno.nombre }}
-    </h2>
+    <!-- Tarjeta del Alumno -->
+    <div class="student-card">
+        
+        <div class="student-avatar-container">
+            {% if alumno.foto %}
+            <img
+                src="{{ url_for('static', filename='img/alumnos/' + alumno.foto) }}"
+                class="student-photo"
+                alt="{{ alumno.nombre }}"
+            >
+            {% else %}
+            <div class="student-photo placeholder">
+                👤
+            </div>
+            {% endif %}
+        </div>
 
-    <p>
-        {{ alumno.grado_nombre }}
-    </p>
+        <div class="student-info">
+            <h3 class="student-name">
+                {{ alumno.apellido }}, {{ alumno.nombre }}
+            </h3>
+            
+            <div class="student-badges">
+                <span class="badge badge-grade">🎓 {{ alumno.grado_nombre }}</span>
+                <span class="badge badge-gender">👤 {{ alumno.sexo }}</span>
+            </div>
+        </div>
 
-    <p>
-        Sexo:
-        {{ alumno.sexo }}
-    </p>
-
-    <div class="student-actions">
-
-        <a
-            class="primary-btn"
-            href="/alumnos/qr/{{ alumno.id }}"
-        >
-            Ver QR
-        </a>
-
-        <a
-            class="delete-btn"
-            href="/alumnos/desactivar/{{ alumno.id }}"
-        >
-            Desactivar
-        </a>
+        <!-- Botonera de acciones -->
+        <div class="student-actions">
+            <a class="action-btn qr-btn" href="/alumnos/qr/{{ alumno.id }}">
+                <span>🧾</span> Ver QR
+            </a>
+            <a class="action-btn delete-btn" href="/alumnos/desactivar/{{ alumno.id }}">
+                <span>🚫</span> Desactivar
+            </a>
+        </div>
 
     </div>
 
+    {% endfor %}
+
+    {% if alumnos %}
+            </div> <!-- Cierre del último student-grid -->
+        </div> <!-- Cierre de la última school-section -->
+    {% endif %}
+
 </div>
-
-
-{% endfor %}
-
-</div>
-
 {% endblock %}

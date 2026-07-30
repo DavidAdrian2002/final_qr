@@ -124,6 +124,213 @@ body{
 .menu-card.logout-card:active {
     background: rgba(225, 29, 72, 0.45);
 }
+/* Contenedor general para la vista de Alumnos */
+.alumnos-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    background: url('../img/fondodash.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding: 24px 16px 50px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header principal */
+.page-header {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.header-info {
+    text-align: center;
+}
+
+.add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    transition: transform 0.15s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.add-btn:active {
+    transform: scale(0.97);
+}
+
+/* Mensaje de Éxito / Flash */
+.success-box {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    backdrop-filter: blur(10px);
+    color: #6ee7b7;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
+/* Sección por Escuela */
+.school-section {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 30px;
+}
+
+.school-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 14px;
+}
+
+.school-icon {
+    font-size: 1.3rem;
+}
+
+.school-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+}
+
+/* Grilla de Alumnos */
+.student-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 columna cómoda en celular */
+    gap: 14px;
+}
+
+/* Tarjeta individual de Alumno */
+.student-card {
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Avatar / Foto */
+.student-avatar-container {
+    margin-bottom: 12px;
+}
+
+.student-photo {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(56, 189, 248, 0.6);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.student-photo.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 41, 59, 0.8);
+    font-size: 2.2rem;
+}
+
+/* Info del Alumno */
+.student-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+}
+
+.student-badges {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+}
+
+.badge-grade {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.25);
+}
+
+/* Botonera interna de la Tarjeta */
+.student-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.qr-btn {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.delete-btn {
+    background: rgba(244, 63, 94, 0.18);
+    color: #f43f5e;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
 .topbar{
     width:100%;
     background:#2563eb;
