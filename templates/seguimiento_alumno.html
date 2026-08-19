@@ -6,219 +6,328 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
 
 {% block content %}
 
-<div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1 class="page-title" style="margin: 0;">Ficha de Seguimiento Individual</h1>
-    <!-- LÍNEA 11: Reemplaza la línea que tiene 'ver_alumno' por esto: -->
-<a href="/alumnos" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; background: #e2e8f0; color: #2d3748;">
-    Volver
-</a>
+<!-- ESTILOS EXCLUSIVOS PARA IMPRESIÓN A4 Y PANTALLA -->
+<style>
+    /* Estilos generales */
+    .seguimiento-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #ffffff;
+        font-family: Arial, sans-serif;
+        color: #2d3748;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .report-table th, .report-table td {
+        border: 1px solid #cbd5e0;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+    }
+
+    .report-table th {
+        background-color: #edf2f7;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        margin-top: 25px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid #3182ce;
+        padding-bottom: 4px;
+        color: #1a365d;
+    }
+
+    /* REGLAS DE IMPRESIÓN (PDF / A4) */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 12mm 15mm 12mm 15mm;
+        }
+
+        body {
+            background: white !important;
+            color: #000 !important;
+            font-size: 11pt !important;
+        }
+
+        /* Ocultar elementos no imprimibles */
+        .no-print, 
+        nav, 
+        header, 
+        footer, 
+        .btn-action,
+        #clear-signature,
+        .sidebar {
+            display: none !important;
+        }
+
+        .seguimiento-container {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .section-block {
+            page-break-inside: avoid;
+        }
+
+        /* Convertir inputs y selects en apariencia de texto plano para impresión */
+        input[type="text"], 
+        input[type="number"], 
+        select, 
+        textarea {
+            border: none !important;
+            background: transparent !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            box-shadow: none !important;
+            padding: 2px !important;
+        }
+
+        /* Mostrar valores seleccionados claramente */
+        input[type="radio"] {
+            accent-color: #000;
+        }
+
+        .report-info {
+            border-left: 4px solid #000 !important;
+            background: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .report-table th {
+            background-color: #f1f5f9 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+
+<div class="seguimiento-container">
+
+    <!-- ENCABEZADO Y BOTONES DE ACCIÓN -->
+    <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 class="page-title" style="margin: 0; font-size: 1.6rem; color: #2b6cb0;">Ficha de Seguimiento Individual</h1>
+        
+        <div class="no-print" style="display: flex; gap: 10px; align-items: center;">
+            <a href="/alumnos" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; background: #e2e8f0; color: #2d3748; font-weight: 500;">
+                Volver
+            </a>
+            <button type="button" onclick="window.print()" style="padding: 8px 16px; border: none; border-radius: 4px; background: #3182ce; color: white; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                🖨️ Imprimir Ficha
+            </button>
+        </div>
+    </div>
+
+    <!-- CREDENCIALES DEL ALUMNO -->
+    <div class="report-info" style="background: #f7fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #3182ce; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <p style="margin: 2px 0;"><strong>Alumno:</strong> {{ alumno.apellido }}, {{ alumno.nombre }}</p>
+            <p style="margin: 2px 0;"><strong>Grado:</strong> {{ alumno.grado_nombre }}</p>
+            <p style="margin: 2px 0;"><strong>Escuela:</strong> {{ alumno.escuela_nombre if alumno.escuela_nombre else 'General' }}</p>
+        </div>
+    </div>
+
+    <form method="POST" id="formSeguimiento">
+        {% if csrf_token %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+
+        <input type="hidden" name="grado_id" value="{{ alumno.grado_id }}">
+        <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+
+        <!-- PERÍODO O MES -->
+        <div class="section-block" style="margin-bottom: 20px;">
+            <label for="mes"><strong>Mes / Período:</strong></label>
+            <input 
+                type="text" 
+                id="mes" 
+                name="mes" 
+                value="{{ seguimiento.mes if seguimiento else '' }}" 
+                placeholder="Ej: Marzo 2026"
+                required 
+                style="padding: 6px 10px; border-radius: 4px; border: 1px solid #cbd5e0; margin-left: 10px; width: 200px;"
+            >
+        </div>
+
+        <!-- 1. ASISTENCIA Y PUNTUALIDAD -->
+        <div class="section-block">
+            <h2 class="section-title">1. Asistencia y Puntualidad</h2>
+            <div style="overflow-x: auto;">
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Semana</th>
+                            <th style="text-align: center; width: 110px;">Asistencias</th>
+                            <th style="text-align: center; width: 110px;">Inasistencias</th>
+                            <th style="text-align: center; width: 110px;">Llegadas Tarde</th>
+                            <th style="text-align: left;">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(1, 5) %}
+                        <tr>
+                            <td><strong>Semana {{ i }}</strong></td>
+                            <td style="text-align: center;">
+                                <input type="number" class="calc-asist" name="asistencias_s{{ i }}" value="{{ seguimiento['asistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
+                            </td>
+                            <td style="text-align: center;">
+                                <input type="number" class="calc-inasist" name="inasistencias_s{{ i }}" value="{{ seguimiento['inasistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
+                            </td>
+                            <td style="text-align: center;">
+                                <input type="number" class="calc-tard" name="tardanzas_s{{ i }}" value="{{ seguimiento['tardanzas_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
+                            </td>
+                            <td>
+                                <input type="text" name="obs_s{{ i }}" value="{{ seguimiento['obs_s' ~ i] if seguimiento else '' }}" placeholder="Observación..." style="width: 98%;">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f7fafc; font-weight: bold;">
+                            <td>Total Mes</td>
+                            <td id="total-asistencias" style="text-align: center;">0</td>
+                            <td id="total-inasistencias" style="text-align: center;">0</td>
+                            <td id="total-tardanzas" style="text-align: center;">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. DESEMPEÑO ACADÉMICO Y TRABAJO EN AULA -->
+        <div class="section-block">
+            <h2 class="section-title">2. Desempeño Académico y Trabajo en Aula</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px;">
+                <div>
+                    <label for="participacion"><strong>Participación en Clase:</strong></label>
+                    <select id="participacion" name="participacion" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
+                        <option value="">Seleccionar...</option>
+                        {% set part_val = seguimiento.participacion if seguimiento else '' %}
+                        <option value="Muy Activa" {{ 'selected' if part_val == 'Muy Activa' }}>Muy Activa</option>
+                        <option value="Regular" {{ 'selected' if part_val == 'Regular' }}>Regular</option>
+                        <option value="Poco Participativo" {{ 'selected' if part_val == 'Poco Participativo' }}>Poco Participativo</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="entrega_tareas"><strong>Entrega de Tareas:</strong></label>
+                    <select id="entrega_tareas" name="entrega_tareas" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
+                        <option value="">Seleccionar...</option>
+                        {% set tareas_val = seguimiento.entrega_tareas if seguimiento else '' %}
+                        <option value="Siempre a Tiempo" {{ 'selected' if tareas_val == 'Siempre a Tiempo' }}>Siempre a Tiempo</option>
+                        <option value="A veces Incompleto" {{ 'selected' if tareas_val == 'A veces Incompleto' }}>A veces Incompleto</option>
+                        <option value="Rara vez Entrega" {{ 'selected' if tareas_val == 'Rara vez Entrega' }}>Rara vez Entrega</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="comprension_contenidos"><strong>Comprensión de Contenidos:</strong></label>
+                    <select id="comprension_contenidos" name="comprension_contenidos" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
+                        <option value="">Seleccionar...</option>
+                        {% set comp_val = seguimiento.comprension_contenidos if seguimiento else '' %}
+                        <option value="Excelente" {{ 'selected' if comp_val == 'Excelente' }}>Excelente</option>
+                        <option value="En Proceso" {{ 'selected' if comp_val == 'En Proceso' }}>En Proceso</option>
+                        <option value="Requiere Apoyo Extra" {{ 'selected' if comp_val == 'Requiere Apoyo Extra' }}>Requiere Apoyo Extra</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. CONDUCTA Y CONVIVENCIA -->
+        <div class="section-block">
+            <h2 class="section-title">3. Conducta y Convivencia</h2>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Criterio</th>
+                        <th style="text-align: center; width: 90px;">Siempre</th>
+                        <th style="text-align: center; width: 90px;">A veces</th>
+                        <th style="text-align: center; width: 90px;">Nunca</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set criterios = [
+                        ('respeta_normas', 'Respeta las normas de la institución'),
+                        ('trabaja_en_equipo', 'Demuestra disposición para el trabajo en equipo'),
+                        ('mantiene_respeto', 'Mantiene un trato respetuoso hacia compañeros y docentes')
+                    ] %}
+                    {% for campo, texto in criterios %}
+                    {% set campo_val = seguimiento[campo] if seguimiento else '' %}
+                    <tr>
+                        <td>{{ texto }}</td>
+                        <td style="text-align: center;">
+                            <input type="radio" name="{{ campo }}" value="Siempre" required {{ 'checked' if campo_val == 'Siempre' }}>
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="radio" name="{{ campo }}" value="A veces" {{ 'checked' if campo_val == 'A veces' }}>
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="radio" name="{{ campo }}" value="Nunca" {{ 'checked' if campo_val == 'Nunca' }}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. OBSERVACIONES GENERALES Y EVOLUCIÓN -->
+        <div class="section-block">
+            <h2 class="section-title">4. Observaciones Generales y Evolución</h2>
+            <textarea 
+                name="observaciones_generales" 
+                rows="4" 
+                style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #cbd5e0; font-family: inherit; box-sizing: border-box; resize: vertical;" 
+                placeholder="Escriba el informe cualitativo del estudiante..."
+            >{{ seguimiento.observaciones_generales if seguimiento else '' }}</textarea>
+        </div>
+
+        <!-- 5. FIRMA ELECTRÓNICA DEL DOCENTE -->
+        <div class="section-block">
+            <h2 class="section-title">5. Firma del Docente</h2>
+
+            <p class="no-print" style="margin-top: 5px; font-size: 0.85rem; color: #718096;">
+                Dibuje su firma con el dedo en la pantalla táctil o con el puntero del mouse:
+            </p>
+
+            <div style="margin-top: 10px; text-align: center;">
+                <div style="border: 2px dashed #a0aec0; background: #fafafa; display: inline-block; border-radius: 8px; width: 100%; max-width: 400px; touch-action: none;">
+                    <canvas id="signature-pad" style="width: 100%; height: 150px; display: block;"></canvas>
+                </div>
+                <br>
+                <button 
+                    type="button" 
+                    id="clear-signature" 
+                    class="no-print"
+                    style="margin-top: 8px; padding: 5px 12px; background: #718096; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;"
+                >
+                    Limpiar Firma
+                </button>
+            </div>
+        </div>
+
+        <!-- Campo donde se inserta el Base64 de la firma -->
+        <input type="hidden" name="firma_base64" id="firma_base64" value="{{ seguimiento.firma_base64 if seguimiento else '' }}">
+
+        <!-- BOTONES DE ACCIÓN (SOLO PANTALLA) -->
+        <div class="no-print" style="margin-top: 35px; margin-bottom: 30px; text-align: center;">
+            <button class="primary-btn" type="submit" style="padding: 12px 35px; font-size: 1.05rem; cursor: pointer; background: #2b6cb0; color: white; border: none; border-radius: 5px; font-weight: bold;">
+                Guardar Seguimiento
+            </button>
+        </div>
+
+    </form>
 </div>
-
-<!-- CREDENCIALES DEL ALUMNO -->
-<div class="report-info" style="background: #f7fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #3182ce; margin-bottom: 25px;">
-    <p style="margin: 4px 0;"><strong>Alumno:</strong> {{ alumno.apellido }}, {{ alumno.nombre }}</p>
-    <p style="margin: 4px 0;"><strong>Grado:</strong> {{ alumno.grado_nombre }}</p>
-    <p style="margin: 4px 0;"><strong>Escuela:</strong> {{ alumno.escuela_nombre if alumno.escuela_nombre else 'General' }}</p>
-</div>
-
-<form method="POST" id="formSeguimiento">
-    {# Token CSRF si utilizas Flask-WTF #}
-    {% if csrf_token %}
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% endif %}
-
-    <input type="hidden" name="grado_id" value="{{ alumno.grado_id }}">
-    <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
-
-    <!-- PERÍODO O MES -->
-    <div style="margin-bottom: 25px;">
-        <label for="mes"><strong>Mes / Período:</strong></label>
-        <input 
-            type="text" 
-            id="mes" 
-            name="mes" 
-            value="{{ seguimiento.mes if seguimiento else '' }}" 
-            placeholder="Ej: Marzo 2026"
-            required 
-            style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-left: 10px; width: 220px;"
-        >
-    </div>
-
-    <!-- 1. ASISTENCIA Y PUNTUALIDAD -->
-    <h2 style="font-size: 1.2rem; margin-top: 25px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-        1. Asistencia y Puntualidad
-    </h2>
-
-    <div class="table-container" style="overflow-x: auto;">
-        <table class="report-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-                <tr style="background: #edf2f7;">
-                    <th style="padding: 8px; border: 1px solid #cbd5e0;">Semana</th>
-                    <th style="padding: 8px; border: 1px solid #cbd5e0;">Asistencias</th>
-                    <th style="padding: 8px; border: 1px solid #cbd5e0;">Inasistencias</th>
-                    <th style="padding: 8px; border: 1px solid #cbd5e0;">Llegadas Tarde</th>
-                    <th style="padding: 8px; border: 1px solid #cbd5e0;">Observaciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in range(1, 5) %}
-                <tr>
-                    <td style="padding: 8px; border: 1px solid #cbd5e0;"><strong>Semana {{ i }}</strong></td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="number" class="calc-asist" name="asistencias_s{{ i }}" value="{{ seguimiento['asistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 60px; text-align: center; padding: 4px;">
-                    </td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="number" class="calc-inasist" name="inasistencias_s{{ i }}" value="{{ seguimiento['inasistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 60px; text-align: center; padding: 4px;">
-                    </td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="number" class="calc-tard" name="tardanzas_s{{ i }}" value="{{ seguimiento['tardanzas_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 60px; text-align: center; padding: 4px;">
-                    </td>
-                    <td style="border: 1px solid #cbd5e0; padding: 4px;">
-                        <input type="text" name="obs_s{{ i }}" value="{{ seguimiento['obs_s' ~ i] if seguimiento else '' }}" placeholder="Observación..." style="width: 98%; padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px;">
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr style="background: #f7fafc; font-weight: bold;">
-                    <td style="padding: 8px; border: 1px solid #cbd5e0;">Total Mes</td>
-                    <td id="total-asistencias" style="text-align: center; border: 1px solid #cbd5e0;">0</td>
-                    <td id="total-inasistencias" style="text-align: center; border: 1px solid #cbd5e0;">0</td>
-                    <td id="total-tardanzas" style="text-align: center; border: 1px solid #cbd5e0;">0</td>
-                    <td style="border: 1px solid #cbd5e0;"></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-    <!-- 2. DESEMPEÑO ACADÉMICO Y TRABAJO EN AULA -->
-    <h2 style="font-size: 1.2rem; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-        2. Desempeño Académico y Trabajo en Aula
-    </h2>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px; margin-bottom: 25px;">
-        <div style="flex: 1; min-width: 220px;">
-            <label for="participacion"><strong>Participación en Clase:</strong></label><br>
-            <select id="participacion" name="participacion" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc;">
-                <option value="">Seleccionar...</option>
-                {% set part_val = seguimiento.participacion if seguimiento else '' %}
-                <option value="Muy Activa" {{ 'selected' if part_val == 'Muy Activa' }}>Muy Activa</option>
-                <option value="Regular" {{ 'selected' if part_val == 'Regular' }}>Regular</option>
-                <option value="Poco Participativo" {{ 'selected' if part_val == 'Poco Participativo' }}>Poco Participativo</option>
-            </select>
-        </div>
-
-        <div style="flex: 1; min-width: 220px;">
-            <label for="entrega_tareas"><strong>Entrega de Tareas:</strong></label><br>
-            <select id="entrega_tareas" name="entrega_tareas" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc;">
-                <option value="">Seleccionar...</option>
-                {% set tareas_val = seguimiento.entrega_tareas if seguimiento else '' %}
-                <option value="Siempre a Tiempo" {{ 'selected' if tareas_val == 'Siempre a Tiempo' }}>Siempre a Tiempo</option>
-                <option value="A veces Incompleto" {{ 'selected' if tareas_val == 'A veces Incompleto' }}>A veces Incompleto</option>
-                <option value="Rara vez Entrega" {{ 'selected' if tareas_val == 'Rara vez Entrega' }}>Rara vez Entrega</option>
-            </select>
-        </div>
-
-        <div style="flex: 1; min-width: 220px;">
-            <label for="comprension_contenidos"><strong>Comprensión de Contenidos:</strong></label><br>
-            <select id="comprension_contenidos" name="comprension_contenidos" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc;">
-                <option value="">Seleccionar...</option>
-                {% set comp_val = seguimiento.comprension_contenidos if seguimiento else '' %}
-                <option value="Excelente" {{ 'selected' if comp_val == 'Excelente' }}>Excelente</option>
-                <option value="En Proceso" {{ 'selected' if comp_val == 'En Proceso' }}>En Proceso</option>
-                <option value="Requiere Apoyo Extra" {{ 'selected' if comp_val == 'Requiere Apoyo Extra' }}>Requiere Apoyo Extra</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- 3. CONDUCTA Y CONVIVENCIA -->
-    <h2 style="font-size: 1.2rem; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-        3. Conducta y Convivencia
-    </h2>
-
-    <div class="table-container">
-        <table class="report-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-                <tr style="background: #edf2f7;">
-                    <th style="text-align: left; padding: 8px; border: 1px solid #cbd5e0;">Criterio</th>
-                    <th style="text-align: center; width: 100px; padding: 8px; border: 1px solid #cbd5e0;">Siempre</th>
-                    <th style="text-align: center; width: 100px; padding: 8px; border: 1px solid #cbd5e0;">A veces</th>
-                    <th style="text-align: center; width: 100px; padding: 8px; border: 1px solid #cbd5e0;">Nunca</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set criterios = [
-                    ('respeta_normas', 'Respeta las normas de la institución'),
-                    ('trabaja_en_equipo', 'Demuestra disposición para el trabajo en equipo'),
-                    ('mantiene_respeto', 'Mantiene un trato respetuoso hacia compañeros y docentes')
-                ] %}
-                {% for campo, texto in criterios %}
-                {% set campo_val = seguimiento[campo] if seguimiento else '' %}
-                <tr>
-                    <td style="text-align: left; padding: 8px; border: 1px solid #cbd5e0;">{{ texto }}</td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="radio" name="{{ campo }}" value="Siempre" required {{ 'checked' if campo_val == 'Siempre' }}>
-                    </td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="radio" name="{{ campo }}" value="A veces" {{ 'checked' if campo_val == 'A veces' }}>
-                    </td>
-                    <td style="text-align: center; border: 1px solid #cbd5e0;">
-                        <input type="radio" name="{{ campo }}" value="Nunca" {{ 'checked' if campo_val == 'Nunca' }}>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 4. OBSERVACIONES GENERALES Y EVOLUCIÓN -->
-    <h2 style="font-size: 1.2rem; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-        4. Observaciones Generales y Evolución
-    </h2>
-
-    <div style="margin-top: 15px; margin-bottom: 25px;">
-        <textarea 
-            name="observaciones_generales" 
-            rows="5" 
-            style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; box-sizing: border-box;" 
-            placeholder="Escriba el informe cualitativo del estudiante..."
-        >{{ seguimiento.observaciones_generales if seguimiento else '' }}</textarea>
-    </div>
-
-    <!-- 5. FIRMA ELECTRÓNICA DEL DOCENTE -->
-    <h2 style="font-size: 1.2rem; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-        5. Firma Electrónica del Docente
-    </h2>
-
-    <p style="margin-top: 10px; font-size: 0.9rem; color: #555;">
-        Dibuje su firma con el dedo en la pantalla táctil o con el puntero:
-    </p>
-
-    <div style="margin-top: 10px; text-align: center;">
-        <div style="border: 2px dashed #2b6cb0; background: #fafafa; display: inline-block; border-radius: 8px; width: 100%; max-width: 450px; touch-action: none; position: relative;">
-            <canvas id="signature-pad" style="width: 100%; height: 180px; display: block;"></canvas>
-        </div>
-        <br>
-        <button 
-            type="button" 
-            id="clear-signature" 
-            style="margin-top: 10px; padding: 6px 14px; background: #718096; color: white; border: none; border-radius: 4px; cursor: pointer;"
-        >
-            Limpiar Firma
-        </button>
-    </div>
-
-    <!-- Campo donde se inserta el Base64 de la firma -->
-    <input type="hidden" name="firma_base64" id="firma_base64" value="{{ seguimiento.firma_base64 if seguimiento else '' }}">
-
-    <!-- BOTONES DE ACCIÓN -->
-    <div style="margin-top: 35px; margin-bottom: 50px; text-align: center; display: flex; justify-content: center; gap: 15px;">
-        <button class="primary-btn" type="submit" style="padding: 12px 30px; font-size: 1.1rem; cursor: pointer; background: #3182ce; color: white; border: none; border-radius: 5px;">
-            Guardar Seguimiento
-        </button>
-    </div>
-
-</form>
 
 <!-- CDN SignaturePad -->
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
@@ -230,14 +339,12 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
             penColor: 'rgb(0, 0, 128)'
         });
 
-        // Redimensionar Canvas considerando pixelRatio para evitar trazos desalineados
         function resizeCanvas() {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
             
-            // Si ya existía firma previa (Base64), cargarla
             const savedFirma = document.getElementById('firma_base64').value;
             if (savedFirma) {
                 signaturePad.fromDataURL(savedFirma);
