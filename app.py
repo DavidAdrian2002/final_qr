@@ -1664,68 +1664,126 @@ def seguimiento_alumno(alumno_id):
     return render_template("seguimiento_alumno.html", alumno=alumno)
 
 # =========================
-# SELECCIÓN DE SEGUIMIENTO (Escuela -> Grado -> Alumno)
+# FICHA DE SEGUIMIENTO INDIVIDUAL (Carga y Guardado)
 # =========================
-@app.route("/seguimiento")
-def seguimiento_inicio():
+@app.route("/seguimiento/<int:alumno_id>", methods=["GET", "POST"])
+def seguimiento_alumno(alumno_id):
     if "docente_id" not in session:
         return redirect("/login")
 
-    docente_id = session["docente_id"]
     conn = get_connection()
     cursor = conn.cursor()
     ph = "%s" if DATABASE_URL else "?"
 
-    escuela_id = request.args.get("escuela_id", type=int)
-    grado_id = request.args.get("grado_id", type=int)
+    if request.method == "POST":
+        # 1. Captura de datos enviados desde el formulario
+        mes = request.form.get("mes")
+        grado_id = request.form.get("grado_id")
 
-    # 1. Obtener escuelas asociadas al docente
-    cursor.execute(f"""
-        SELECT e.id, e.nombre, e.numero 
-        FROM escuelas e
-        INNER JOIN docente_escuelas de ON e.id = de.escuela_id
-        WHERE de.docente_id = {ph}
-    """, (docente_id,))
-    escuelas = cursor.fetchall()
+        asistencias_s1 = request.form.get("asistencias_s1", 0)
+        asistencias_s2 = request.form.get("asistencias_s2", 0)
+        asistencias_s3 = request.form.get("asistencias_s3", 0)
+        asistencias_s4 = request.form.get("asistencias_s4", 0)
 
-    # 2. Si seleccionó escuela, obtener grados
-    grados = []
-    if escuela_id:
-        cursor.execute(f"SELECT id, nombre FROM grados WHERE escuela_id = {ph}", (escuela_id,))
-        grados = cursor.fetchall()
+        inasistencias_s1 = request.form.get("inasistencias_s1", 0)
+        inasistencias_s2 = request.form.get("inasistencias_s2", 0)
+        inasistencias_s3 = request.form.get("inasistencias_s3", 0)
+        inasistencias_s4 = request.form.get("inasistencias_s4", 0)
 
-    # 3. Si seleccionó grado, obtener alumnos
-    alumnos = []
-    if grado_id:
+        tardanzas_s1 = request.form.get("tardanzas_s1", 0)
+        tardanzas_s2 = request.form.get("tardanzas_s2", 0)
+        tardanzas_s3 = request.form.get("tardanzas_s3", 0)
+        tardanzas_s4 = request.form.get("tardanzas_s4", 0)
+
+        obs_s1 = request.form.get("obs_s1", "")
+        obs_s2 = request.form.get("obs_s2", "")
+        obs_s3 = request.form.get("obs_s3", "")
+        obs_s4 = request.form.get("obs_s4", "")
+
+        participacion = request.form.get("participacion")
+        entrega_tareas = request.form.get("entrega_tareas")
+        comprension_contenidos = request.form.get("comprension_contenidos")
+
+        respeta_normas = request.form.get("respeta_normas")
+        trabaja_en_equipo = request.form.get("trabaja_en_equipo")
+        mantiene_respeto = request.form.get("mantiene_respeto")
+
+        observaciones_generales = request.form.get("observaciones_generales")
+        firma_base64 = request.form.get("firma_base64")
+
+        # 2. Inserción en la base de datos
         cursor.execute(f"""
-            SELECT id, nombre, apellido, dni 
-            FROM alumnos 
-            WHERE grado_id = {ph} AND activo = 1 
-            ORDER BY apellido ASC
-        """, (grado_id,))
-        alumnos = cursor.fetchall()
+            INSERT INTO seguimientos (
+                alumno_id, grado_id, docente_id, mes,
+                asistencias_s1, asistencias_s2, asistencias_s3, asistencias_s4,
+                inasistencias_s1, inasistencias_s2, inasistencias_s3, inasistencias_s4,
+                tardanzas_s1, tardanzas_s2, tardanzas_s3, tardanzas_s4,
+                obs_s1, obs_s2, obs_s3, obs_s4,
+                participacion, entrega_tareas, comprension_contenidos,
+                respeta_normas, trabaja_en_equipo, mantiene_respeto,
+                observaciones_generales, firma_base64
+            ) VALUES (
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph},
+                {ph}, {ph}
+            )
+        """, (
+            alumno_id, grado_id, session["docente_id"], mes,
+            asistencias_s1, asistencias_s2, asistencias_s3, asistencias_s4,
+            inasistencias_s1, inasistencias_s2, inasistencias_s3, inasistencias_s4,
+            tardanzas_s1, tardanzas_s2, tardanzas_s3, tardanzas_s4,
+            obs_s1, obs_s2, obs_s3, obs_s4,
+            participacion, entrega_tareas, comprension_contenidos,
+            respeta_normas, trabaja_en_equipo, mantiene_respeto,
+            observaciones_generales, firma_base64
+        ))
 
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("seguimiento_inicio", grado_id=grado_id))
+
+    # GET: Obtener datos del alumno con su escuela y grado asignado
+    cursor.execute(f"""
+        SELECT 
+            a.id, 
+            a.nombre, 
+            a.apellido, 
+            a.grado_id,
+            g.nombre AS grado_nombre,
+            e.nombre AS escuela_nombre
+        FROM alumnos a
+        LEFT JOIN grados g ON a.grado_id = g.id
+        LEFT JOIN escuelas e ON g.escuela_id = e.id
+        WHERE a.id = {ph}
+    """, (alumno_id,))
+    
+    row = cursor.fetchone()
     conn.close()
 
-    return render_template(
-        "seguimiento_seleccion.html",
-        escuelas=escuelas,
-        grados=grados,
-        alumnos=alumnos,
-        escuela_id=escuela_id,
-        grado_id=grado_id
-    )
-@app.route('/seguimiento/<int:alumno_id>', methods=['GET', 'POST'])
-def seguimiento_alumno(alumno_id):
-    # 1. Buscar al alumno en la base de datos
-    alumno = Alumno.query.get_or_404(alumno_id)
-    
-    if request.method == 'POST':
-        # Procesar y guardar el seguimiento en la BD...
-        pass
+    if not row:
+        return "Alumno no encontrado", 404
 
-    # 2. Renderizar el template enviando el objeto 'alumno'
-    return render_template('seguimiento_alumno.html', alumno=alumno)
+    # Formateo como diccionario para compatibilidad con la notación de punto en Jinja2
+    if isinstance(row, dict):
+        alumno = row
+    else:
+        alumno = {
+            "id": row[0],
+            "nombre": row[1],
+            "apellido": row[2],
+            "grado_id": row[3],
+            "grado_nombre": row[4],
+            "escuela_nombre": row[5]
+        }
+
+    return render_template("seguimiento_alumno.html", alumno=alumno)
+
 
 # =========================
 # DASHBOARD
