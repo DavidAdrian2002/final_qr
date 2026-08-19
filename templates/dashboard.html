@@ -56,12 +56,13 @@ Panel Principal
             <span>Cerrar Sesión</span>
         </a>
 
-        <a class="menu-card" href="{{ url_for('seguimiento_alumno') if url_for else '/seguimiento' }}">
+        <!-- Opción A: Si tu ruta de lista de alumnos se llama 'alumnos' -->
+<a class="menu-card" href="{{ url_for('alumnos') }}">
     <div class="card-icon">
         <i data-lucide="clipboard-check"></i>
     </div>
     <span>Seguimiento</span>
-    </a>
+</a>
 
     </div>
 
