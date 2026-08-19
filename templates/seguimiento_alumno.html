@@ -8,9 +8,10 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
 
 <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1 class="page-title" style="margin: 0;">Ficha de Seguimiento Individual</h1>
-    <a href="{{ url_for('ver_alumno', id=alumno.id) if url_for else '#' }}" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; background: #e2e8f0; color: #2d3748;">
-        &larr; Volver
-    </a>
+    <!-- LÍNEA 11: Reemplaza la línea que tiene 'ver_alumno' por esto: -->
+<a href="{{ url_for('seguimiento_inicio') }}" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; background: #e2e8f0; color: #2d3748;">
+    Volver
+</a>
 </div>
 
 <!-- CREDENCIALES DEL ALUMNO -->
