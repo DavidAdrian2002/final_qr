@@ -1715,6 +1715,17 @@ def seguimiento_inicio():
         escuela_id=escuela_id,
         grado_id=grado_id
     )
+@app.route('/seguimiento/<int:alumno_id>', methods=['GET', 'POST'])
+def seguimiento_alumno(alumno_id):
+    # 1. Buscar al alumno en la base de datos
+    alumno = Alumno.query.get_or_404(alumno_id)
+    
+    if request.method == 'POST':
+        # Procesar y guardar el seguimiento en la BD...
+        pass
+
+    # 2. Renderizar el template enviando el objeto 'alumno'
+    return render_template('seguimiento_alumno.html', alumno=alumno)
 
 # =========================
 # DASHBOARD

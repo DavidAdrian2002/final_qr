@@ -89,6 +89,13 @@ Alumnos
             <a class="action-btn delete-btn" href="/alumnos/desactivar/{{ alumno.id }}">
                 <span>🚫</span> Desactivar
             </a>
+            <!-- Dentro del for donde se recorren los alumnos -->
+<a class="btn-seguimiento" 
+   href="{{ url_for('seguimiento_alumno', alumno_id=alumno.id) }}" 
+   style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #2b6cb0; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9rem;">
+    <i data-lucide="clipboard-check" style="width: 16px; height: 16px;"></i>
+    <span>Seguimiento</span>
+</a>
         </div>
 
     </div>
