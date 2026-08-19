@@ -175,6 +175,42 @@ def init_db():
         REFERENCES escuelas(id)
     )
     """)
+    # =========================
+    # SEGUIMIENTOS DE ALUMNOS
+    # =========================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS seguimientos_alumnos (
+        id SERIAL PRIMARY KEY,
+
+        alumno_id INTEGER NOT NULL,
+        docente_id INTEGER NOT NULL,
+        mes TEXT NOT NULL,
+
+        -- Asistencia (Semanas 1 a 4)
+        asistencias_s1 INTEGER DEFAULT 0, inasistencias_s1 INTEGER DEFAULT 0, tardanzas_s1 INTEGER DEFAULT 0, obs_s1 TEXT,
+        asistencias_s2 INTEGER DEFAULT 0, inasistencias_s2 INTEGER DEFAULT 0, tardanzas_s2 INTEGER DEFAULT 0, obs_s2 TEXT,
+        asistencias_s3 INTEGER DEFAULT 0, inasistencias_s3 INTEGER DEFAULT 0, tardanzas_s3 INTEGER DEFAULT 0, obs_s3 TEXT,
+        asistencias_s4 INTEGER DEFAULT 0, inasistencias_s4 INTEGER DEFAULT 0, tardanzas_s4 INTEGER DEFAULT 0, obs_s4 TEXT,
+
+        -- Desempeño Académico
+        participacion TEXT,
+        entrega_tareas TEXT,
+        comprension_contenidos TEXT,
+
+        -- Conducta y Convivencia
+        respeta_normas TEXT,
+        trabaja_en_equipo TEXT,
+        mantiene_respeto TEXT,
+
+        -- Observaciones y Firma
+        observaciones_generales TEXT,
+        firma_base64 TEXT,
+        fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
+
+        FOREIGN KEY(alumno_id) REFERENCES alumnos(id),
+        FOREIGN KEY(docente_id) REFERENCES docentes(id)
+    )
+    """)
 
     conn.commit()
 

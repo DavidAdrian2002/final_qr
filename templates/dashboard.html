@@ -56,6 +56,13 @@ Panel Principal
             <span>Cerrar Sesión</span>
         </a>
 
+        <a class="menu-card" href="{{ url_for('seguimiento_alumno') if url_for else '/seguimiento' }}">
+    <div class="card-icon">
+        <i data-lucide="clipboard-check"></i>
+    </div>
+    <span>Seguimiento</span>
+    </a>
+
     </div>
 
 </div>

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Seguimiento Individual
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Seguimiento Individual de Alumnos
+</h1>
+
+<!-- FILTROS DE ESCUELA Y GRADO -->
+<div class="report-info" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 25px;">
+    
+    <!-- Seleccionar Escuela -->
+    <div>
+        <label for="select_escuela"><strong>Escuela:</strong></label>
+        <select id="select_escuela" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-left: 8px;" onchange="location = this.value;">
+            <option value="/seguimiento">-- Seleccionar Escuela --</option>
+            {% for esc in escuelas %}
+                <option value="/seguimiento?escuela_id={{ esc.id }}" {% if escuela_id == esc.id %}selected{% endif %}>
+                    {{ esc.nombre }} {% if esc.numero %}(N° {{ esc.numero }}){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Seleccionar Grado (Se activa cuando hay escuela elegida) -->
+    {% if escuela_id %}
+    <div>
+        <label for="select_grado"><strong>Grado:</strong></label>
+        <select id="select_grado" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-left: 8px;" onchange="location = this.value;">
+            <option value="/seguimiento?escuela_id={{ escuela_id }}">-- Seleccionar Grado --</option>
+            {% for g in grados %}
+                <option value="/seguimiento?escuela_id={{ escuela_id }}&grado_id={{ g.id }}" {% if grado_id == g.id %}selected{% endif %}>
+                    {{ g.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- TABLA DE ALUMNOS DEL GRADO SELECCIONADO -->
+{% if grado_id %}
+    {% if alumnos %}
+    <div class="table-container">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Alumno</th>
+                    <th style="text-align: center;">DNI</th>
+                    <th style="text-align: center;">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td style="text-align: left;">
+                        <strong>{{ alumno.apellido }}</strong>, {{ alumno.nombre }}
+                    </td>
+                    <td style="text-align: center;">
+                        {{ alumno.dni if alumno.dni else '-' }}
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="/alumno/{{ alumno.id }}/seguimiento" class="primary-btn" style="text-decoration: none; display: inline-block; padding: 6px 14px; font-size: 0.9rem;">
+                            Cargar Seguimiento
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="margin-top: 20px; color: #666;">No hay alumnos registrados o activos en este grado.</p>
+    {% endif %}
+{% else %}
+    <p style="margin-top: 20px; color: #666;">Selecciona la escuela y el grado para listar a los estudiantes.</p>
+{% endif %}
+
+{% endblock %}

@@ -1576,6 +1576,147 @@ def reporte_word():
         f"/static/reportes/{filename}"
     )
 # =========================
+# SEGUIMIENTO INDIVIDUAL DE ALUMNO
+# =========================
+@app.route("/alumno/<int:alumno_id>/seguimiento", methods=["GET", "POST"])
+def seguimiento_alumno(alumno_id):
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Determinar el placeholder según el motor de base de datos activo
+    ph = "%s" if DATABASE_URL else "?"
+
+    if request.method == "POST":
+        mes = request.form.get("mes", "Mes Actual")
+        
+        # Desempeño
+        participacion = request.form.get("participacion")
+        entrega_tareas = request.form.get("entrega_tareas")
+        comprension_contenidos = request.form.get("comprension_contenidos")
+        
+        # Conducta
+        respeta_normas = request.form.get("respeta_normas")
+        trabaja_en_equipo = request.form.get("trabaja_en_equipo")
+        mantiene_respeto = request.form.get("mantiene_respeto")
+        
+        # Observaciones y Firma
+        observaciones_generales = request.form.get("observaciones_generales")
+        firma_base64 = request.form.get("firma_base64")
+
+        # Construir consulta dinámica respetando el placeholder (ph)
+        query = f"""
+            INSERT INTO seguimientos_alumnos (
+                alumno_id, docente_id, mes,
+                asistencias_s1, inasistencias_s1, tardanzas_s1, obs_s1,
+                asistencias_s2, inasistencias_s2, tardanzas_s2, obs_s2,
+                asistencias_s3, inasistencias_s3, tardanzas_s3, obs_s3,
+                asistencias_s4, inasistencias_s4, tardanzas_s4, obs_s4,
+                participacion, entrega_tareas, comprension_contenidos,
+                respeta_normas, trabaja_en_equipo, mantiene_respeto,
+                observaciones_generales, firma_base64
+            ) VALUES (
+                {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph},
+                {ph}, {ph}, {ph},
+                {ph}, {ph}
+            )
+        """
+
+        cursor.execute(query, (
+            alumno_id, docente_id, mes,
+            request.form.get("asistencias_s1", 0), request.form.get("inasistencias_s1", 0), request.form.get("tardanzas_s1", 0), request.form.get("obs_s1", ""),
+            request.form.get("asistencias_s2", 0), request.form.get("inasistencias_s2", 0), request.form.get("tardanzas_s2", 0), request.form.get("obs_s2", ""),
+            request.form.get("asistencias_s3", 0), request.form.get("inasistencias_s3", 0), request.form.get("tardanzas_s3", 0), request.form.get("obs_s3", ""),
+            request.form.get("asistencias_s4", 0), request.form.get("inasistencias_s4", 0), request.form.get("tardanzas_s4", 0), request.form.get("obs_s4", ""),
+            participacion, entrega_tareas, comprension_contenidos,
+            respeta_normas, trabaja_en_equipo, mantiene_respeto,
+            observaciones_generales, firma_base64
+        ))
+        
+        conn.commit()
+        conn.close()
+        return redirect(f"/qr/grado/{request.form.get('grado_id')}")
+
+    # METODO GET: Cargar datos del alumno
+    query_alumno = f"""
+        SELECT 
+            alumnos.id, alumnos.nombre, alumnos.apellido, alumnos.grado_id,
+            grados.nombre AS grado_nombre,
+            escuelas.nombre AS escuela_nombre
+        FROM alumnos
+        INNER JOIN grados ON alumnos.grado_id = grados.id
+        LEFT JOIN escuelas ON grados.escuela_id = escuelas.id
+        WHERE alumnos.id = {ph}
+    """
+    cursor.execute(query_alumno, (alumno_id,))
+    alumno = cursor.fetchone()
+
+    conn.close()
+
+    return render_template("seguimiento_alumno.html", alumno=alumno)
+
+# =========================
+# SELECCIÓN DE SEGUIMIENTO (Escuela -> Grado -> Alumno)
+# =========================
+@app.route("/seguimiento")
+def seguimiento_inicio():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+    ph = "%s" if DATABASE_URL else "?"
+
+    escuela_id = request.args.get("escuela_id", type=int)
+    grado_id = request.args.get("grado_id", type=int)
+
+    # 1. Obtener escuelas asociadas al docente
+    cursor.execute(f"""
+        SELECT e.id, e.nombre, e.numero 
+        FROM escuelas e
+        INNER JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = {ph}
+    """, (docente_id,))
+    escuelas = cursor.fetchall()
+
+    # 2. Si seleccionó escuela, obtener grados
+    grados = []
+    if escuela_id:
+        cursor.execute(f"SELECT id, nombre FROM grados WHERE escuela_id = {ph}", (escuela_id,))
+        grados = cursor.fetchall()
+
+    # 3. Si seleccionó grado, obtener alumnos
+    alumnos = []
+    if grado_id:
+        cursor.execute(f"""
+            SELECT id, nombre, apellido, dni 
+            FROM alumnos 
+            WHERE grado_id = {ph} AND activo = 1 
+            ORDER BY apellido ASC
+        """, (grado_id,))
+        alumnos = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "seguimiento_seleccion.html",
+        escuelas=escuelas,
+        grados=grados,
+        alumnos=alumnos,
+        escuela_id=escuela_id,
+        grado_id=grado_id
+    )
+
+# =========================
 # DASHBOARD
 # =========================
 @app.route("/dashboard")
