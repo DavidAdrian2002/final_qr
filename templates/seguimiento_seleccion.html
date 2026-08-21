@@ -6,79 +6,259 @@ Seguimiento Individual
 
 {% block content %}
 
-<h1 class="page-title">
-    Seguimiento Individual de Alumnos
-</h1>
+<style>
+    .seguimiento-list-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 10px;
+    }
 
-<!-- FILTROS DE ESCUELA Y GRADO -->
-<div class="report-info" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 25px;">
-    
-    <!-- Seleccionar Escuela -->
-    <div>
-        <label for="select_escuela"><strong>Escuela:</strong></label>
-        <select id="select_escuela" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-left: 8px;" onchange="location = this.value;">
-            <option value="/seguimiento">-- Seleccionar Escuela --</option>
-            {% for esc in escuelas %}
-                <option value="/seguimiento?escuela_id={{ esc.id }}" {% if escuela_id == esc.id %}selected{% endif %}>
-                    {{ esc.nombre }} {% if esc.numero %}(N° {{ esc.numero }}){% endif %}
-                </option>
-            {% endfor %}
-        </select>
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .filter-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .filter-group label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+
+    .filter-select {
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e0;
+        background-color: #fff;
+        font-size: 0.95rem;
+        color: #2d3748;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .filter-select:focus {
+        border-color: #3182ce;
+    }
+
+    /* Lista de alumnos */
+    .student-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 20px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .student-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e0;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ebf8ff;
+        color: #2b6cb0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .student-details h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: #2d3748;
+    }
+
+    .student-details p {
+        margin: 2px 0 0 0;
+        font-size: 0.85rem;
+        color: #718096;
+    }
+
+    .btn-seguimiento {
+        background-color: #3182ce;
+        color: #ffffff;
+        padding: 8px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .btn-seguimiento:hover {
+        background-color: #2b6cb0;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: #f7fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e0;
+        color: #718096;
+    }
+</style>
+
+<div class="seguimiento-list-container">
+
+    <div style="margin-bottom: 20px;">
+        <h1 class="page-title" style="margin-bottom: 5px; color: #1a365d;">Seguimiento Individual de Alumnos</h1>
+        <p style="margin: 0; color: #718096; font-size: 0.95rem;">Selecciona el curso para completar o consultar la ficha pedagógica del estudiante.</p>
     </div>
 
-    <!-- Seleccionar Grado (Se activa cuando hay escuela elegida) -->
-    {% if escuela_id %}
-    <div>
-        <label for="select_grado"><strong>Grado:</strong></label>
-        <select id="select_grado" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-left: 8px;" onchange="location = this.value;">
-            <option value="/seguimiento?escuela_id={{ escuela_id }}">-- Seleccionar Grado --</option>
-            {% for g in grados %}
-                <option value="/seguimiento?escuela_id={{ escuela_id }}&grado_id={{ g.id }}" {% if grado_id == g.id %}selected{% endif %}>
-                    {{ g.nombre }}
-                </option>
-            {% endfor %}
-        </select>
+    <!-- FILTROS EN CASCADA -->
+    <div class="filter-card">
+        <div class="filter-grid">
+            
+            <!-- Seleccionar Escuela -->
+            <div class="filter-group">
+                <label for="select_escuela">Escuela</label>
+                <select id="select_escuela" class="filter-select" onchange="location = this.value;">
+                    <option value="/seguimiento">-- Seleccionar Escuela --</option>
+                    {% for esc in escuelas %}
+                        <option value="/seguimiento?escuela_id={{ esc.id }}" {% if escuela_id == esc.id %}selected{% endif %}>
+                            {{ esc.nombre }} {% if esc.numero %}(N° {{ esc.numero }}){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Seleccionar Grado -->
+            {% if escuela_id %}
+            <div class="filter-group">
+                <label for="select_grado">Grado / Curso</label>
+                <select id="select_grado" class="filter-select" onchange="location = this.value;">
+                    <option value="/seguimiento?escuela_id={{ escuela_id }}">-- Seleccionar Grado --</option>
+                    {% for g in grados %}
+                        <option value="/seguimiento?escuela_id={{ escuela_id }}&grado_id={{ g.id }}" {% if grado_id == g.id %}selected{% endif %}>
+                            {{ g.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+        </div>
     </div>
+
+    <!-- LISTADO DE ALUMNOS -->
+    {% if grado_id %}
+        {% if alumnos %}
+
+            <!-- BUSCADOR RÁPIDO EN PANTALLA -->
+            <input 
+                type="text" 
+                id="searchStudent" 
+                class="search-box" 
+                placeholder="🔍 Buscar alumno por nombre, apellido o DNI..." 
+                onkeyup="filterStudents()"
+            >
+
+            <div class="student-list" id="studentList">
+                {% for alumno in alumnos %}
+                <div class="student-item" data-search="{{ alumno.apellido }} {{ alumno.nombre }} {{ alumno.dni if alumno.dni else '' }}">
+                    <div class="student-info">
+                        <div class="student-avatar">
+                            {{ alumno.apellido[0] | upper }}
+                        </div>
+                        <div class="student-details">
+                            <h3><strong>{{ alumno.apellido }}</strong>, {{ alumno.nombre }}</h3>
+                            <p>DNI: {{ alumno.dni if alumno.dni else 'Sin registrar' }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a href="/alumno/{{ alumno.id }}/seguimiento" class="btn-seguimiento">
+                            📝 Cargar Seguimiento
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size: 1.1rem; margin-bottom: 5px;">📋 No hay alumnos activos</p>
+                <p style="font-size: 0.9rem; margin: 0;">No se encontraron estudiantes registrados en el grado seleccionado.</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <p style="font-size: 1.1rem; margin-bottom: 5px;">🏫 Selección de Curso</p>
+            <p style="font-size: 0.9rem; margin: 0;">Por favor, selecciona la escuela y el grado para desplegar la lista de estudiantes.</p>
+        </div>
     {% endif %}
 
 </div>
 
-<!-- TABLA DE ALUMNOS DEL GRADO SELECCIONADO -->
-{% if grado_id %}
-    {% if alumnos %}
-    <div class="table-container">
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th style="text-align: left;">Alumno</th>
-                    <th style="text-align: center;">DNI</th>
-                    <th style="text-align: center;">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for alumno in alumnos %}
-                <tr>
-                    <td style="text-align: left;">
-                        <strong>{{ alumno.apellido }}</strong>, {{ alumno.nombre }}
-                    </td>
-                    <td style="text-align: center;">
-                        {{ alumno.dni if alumno.dni else '-' }}
-                    </td>
-                    <td style="text-align: center;">
-                        <a href="/alumno/{{ alumno.id }}/seguimiento" class="primary-btn" style="text-decoration: none; display: inline-block; padding: 6px 14px; font-size: 0.9rem;">
-                            Cargar Seguimiento
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <p style="margin-top: 20px; color: #666;">No hay alumnos registrados o activos en este grado.</p>
-    {% endif %}
-{% else %}
-    <p style="margin-top: 20px; color: #666;">Selecciona la escuela y el grado para listar a los estudiantes.</p>
-{% endif %}
+<!-- SCRIPT DE BÚSQUEDA RÁPIDA -->
+<script>
+    function filterStudents() {
+        const input = document.getElementById('searchStudent').value.toLowerCase();
+        const items = document.querySelectorAll('.student-item');
+
+        items.forEach(item => {
+            const text = item.getAttribute('data-search').toLowerCase();
+            if (text.includes(input)) {
+                item.style.display = "flex";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    }
+</script>
 
 {% endblock %}
