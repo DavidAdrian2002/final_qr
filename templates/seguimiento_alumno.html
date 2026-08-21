@@ -353,7 +353,7 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
                     <select id="entrega_tareas" name="entrega_tareas" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
                         <option value="">Seleccionar...</option>
                         {% set tareas_val = seguimiento.entrega_tareas if seguimiento else '' %}
-                        <option value="Siempre a Tiempo" {{ 'selected' if tareas_val == 'Siempre a Tiempo' }}>Siempre a Tiempo</option>
+                        <option value="Siempre a Tiempo" {{ 'selected' if tareas_val == 'Siempre a Tiempo' }}>A Tiempo</option>
                         <option value="A veces Incompleto" {{ 'selected' if tareas_val == 'A veces Incompleto' }}>A veces Incompleto</option>
                         <option value="Rara vez Entrega" {{ 'selected' if tareas_val == 'Rara vez Entrega' }}>Rara vez Entrega</option>
                     </select>
@@ -366,7 +366,7 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
                         {% set comp_val = seguimiento.comprension_contenidos if seguimiento else '' %}
                         <option value="Excelente" {{ 'selected' if comp_val == 'Excelente' }}>Excelente</option>
                         <option value="En Proceso" {{ 'selected' if comp_val == 'En Proceso' }}>En Proceso</option>
-                        <option value="Requiere Apoyo Extra" {{ 'selected' if comp_val == 'Requiere Apoyo Extra' }}>Requiere Apoyo Extra</option>
+                        <option value="Requiere Apoyo Extra" {{ 'selected' if comp_val == 'Requiere Apoyo Extra' }}>Requiere Apoyo del Docente</option>
                     </select>
                 </div>
             </div>
@@ -388,7 +388,8 @@ Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
                     {% set criterios = [
                         ('respeta_normas', 'Respeta las normas de la institución'),
                         ('trabaja_en_equipo', 'Demuestra disposición para el trabajo en equipo'),
-                        ('mantiene_respeto', 'Mantiene un trato respetuoso hacia compañeros y docentes')
+                        ('mantiene_respeto', 'Mantiene un trato respetuoso hacia compañeros y docentes'),
+                        ('respeta_los_simbolos', 'Respeta y valora los símbolos patrios')
                     ] %}
                     {% for campo, texto in criterios %}
                     {% set campo_val = seguimiento[campo] if seguimiento else '' %}
