@@ -1698,6 +1698,51 @@ def seguimiento_alumno(alumno_id):
 
     return render_template("seguimiento_alumno.html", alumno=alumno)
 
+# =========================
+# SELECCIÓN Y FILTRO DE SEGUIMIENTO (Pantalla Previa)
+# =========================
+@app.route("/seguimiento/seleccion", methods=["GET"])
+def seguimiento_seleccion():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+
+    # Captura de parámetros GET para los filtros
+    escuela_id = request.args.get("escuela_id", type=int)
+    grado_id = request.args.get("grado_id", type=int)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    ph = "%s" if DATABASE_URL else "?"
+
+    # 1. Obtener las escuelas pertenecientes al docente
+    cursor.execute(f"SELECT id, nombre, numero FROM escuelas WHERE docente_id = {ph} ORDER BY nombre", (docente_id,))
+    escuelas = cursor.fetchall()
+
+    grados = []
+    alumnos = []
+
+    # 2. Si hay escuela elegida, obtener sus grados
+    if escuela_id:
+        cursor.execute(f"SELECT id, nombre FROM grados WHERE escuela_id = {ph} ORDER BY nombre", (escuela_id,))
+        grados = cursor.fetchall()
+
+    # 3. Si hay grado elegido, obtener los alumnos correspondientes
+    if grado_id:
+        cursor.execute(f"SELECT id, apellido, nombre, dni FROM alumnos WHERE grado_id = {ph} ORDER BY apellido, nombre", (grado_id,))
+        alumnos = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "seguimiento_seleccion.html",
+        escuelas=escuelas,
+        grados=grados,
+        alumnos=alumnos,
+        escuela_id=escuela_id,
+        grado_id=grado_id
+    )
 
 # =========================
 # DASHBOARD
