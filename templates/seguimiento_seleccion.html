@@ -167,10 +167,15 @@ Seguimiento Individual
             <div class="filter-group">
                 <label for="select_escuela">Escuela</label>
                 <select id="select_escuela" class="filter-select" onchange="location = this.value;">
-                    <option value="/seguimiento">-- Seleccionar Escuela --</option>
+                    <option value="{{ url_for('seguimiento_seleccion') }}">-- Seleccionar Escuela --</option>
                     {% for esc in escuelas %}
-                        <option value="/seguimiento?escuela_id={{ esc.id }}" {% if escuela_id == esc.id %}selected{% endif %}>
-                            {{ esc.nombre }} {% if esc.numero %}(N° {{ esc.numero }}){% endif %}
+                        {# Manejo seguro si las filas vienen como tupla o como diccionario #}
+                        {% set esc_id = esc.id if esc.id is defined else esc[0] %}
+                        {% set esc_nom = esc.nombre if esc.nombre is defined else esc[1] %}
+                        {% set esc_num = esc.numero if esc.numero is defined else esc[2] %}
+                        
+                        <option value="{{ url_for('seguimiento_seleccion') }}?escuela_id={{ esc_id }}" {% if escuela_id == esc_id %}selected{% endif %}>
+                            {{ esc_nom }} {% if esc_num %}(N° {{ esc_num }}){% endif %}
                         </option>
                     {% endfor %}
                 </select>
@@ -181,10 +186,13 @@ Seguimiento Individual
             <div class="filter-group">
                 <label for="select_grado">Grado / Curso</label>
                 <select id="select_grado" class="filter-select" onchange="location = this.value;">
-                    <option value="/seguimiento?escuela_id={{ escuela_id }}">-- Seleccionar Grado --</option>
+                    <option value="{{ url_for('seguimiento_seleccion') }}?escuela_id={{ escuela_id }}">-- Seleccionar Grado --</option>
                     {% for g in grados %}
-                        <option value="/seguimiento?escuela_id={{ escuela_id }}&grado_id={{ g.id }}" {% if grado_id == g.id %}selected{% endif %}>
-                            {{ g.nombre }}
+                        {% set g_id = g.id if g.id is defined else g[0] %}
+                        {% set g_nom = g.nombre if g.nombre is defined else g[1] %}
+                        
+                        <option value="{{ url_for('seguimiento_seleccion') }}?escuela_id={{ escuela_id }}&grado_id={{ g_id }}" {% if grado_id == g_id %}selected{% endif %}>
+                            {{ g_nom }}
                         </option>
                     {% endfor %}
                 </select>
@@ -209,19 +217,25 @@ Seguimiento Individual
 
             <div class="student-list" id="studentList">
                 {% for alumno in alumnos %}
-                <div class="student-item" data-search="{{ alumno.apellido }} {{ alumno.nombre }} {{ alumno.dni if alumno.dni else '' }}">
+                    {% set al_id = alumno.id if alumno.id is defined else alumno[0] %}
+                    {% set al_ape = alumno.apellido if alumno.apellido is defined else alumno[1] %}
+                    {% set al_nom = alumno.nombre if alumno.nombre is defined else alumno[2] %}
+                    {% set al_dni = alumno.dni if alumno.dni is defined else alumno[3] %}
+
+                <div class="student-item" data-search="{{ al_ape }} {{ al_nom }} {{ al_dni if al_dni else '' }}">
                     <div class="student-info">
                         <div class="student-avatar">
-                            {{ alumno.apellido[0] | upper }}
+                            {{ al_ape[0] | upper if al_ape else 'A' }}
                         </div>
                         <div class="student-details">
-                            <h3><strong>{{ alumno.apellido }}</strong>, {{ alumno.nombre }}</h3>
-                            <p>DNI: {{ alumno.dni if alumno.dni else 'Sin registrar' }}</p>
+                            <h3><strong>{{ al_ape }}</strong>, {{ al_nom }}</h3>
+                            <p>DNI: {{ al_dni if al_dni else 'Sin registrar' }}</p>
                         </div>
                     </div>
 
                     <div>
-                        <a href="/alumno/{{ alumno.id }}/seguimiento" class="btn-seguimiento">
+                        <!-- Redirección corregida apuntando a la ruta individual existente -->
+                        <a href="{{ url_for('seguimiento_alumno', alumno_id=al_id) }}" class="btn-seguimiento">
                             📝 Cargar Seguimiento
                         </a>
                     </div>
