@@ -1,396 +1,490 @@
 {% extends "base.html" %}
 
 {% block title %}
-Seguimiento Individual - {{ alumno.apellido }}, {{ alumno.nombre }}
+Ficha de Seguimiento - {{ alumno.apellido }}, {{ alumno.nombre }}
 {% endblock %}
 
 {% block content %}
 
-<!-- ESTILOS EXCLUSIVOS PARA IMPRESIÓN A4 Y PANTALLA -->
 <style>
-    /* Estilos generales */
-    .seguimiento-container {
+    /* =======================================================
+       1. ESTILOS PARA LA PANTALLA (WEB)
+       ======================================================= */
+    .ficha-container {
         max-width: 900px;
         margin: 0 auto;
         padding: 20px;
-        background: #ffffff;
-        font-family: Arial, sans-serif;
-        color: #2d3748;
+        background: #f8fafc;
     }
 
-    .report-table {
+    .header-ficha {
+        background: #1a365d;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .card-seccion {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #2b6cb0;
+        border-bottom: 2px solid #ebf8ff;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #4a5568;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    /* Tabla interactiva pantalla */
+    .tabla-evaluacion {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
     }
 
-    .report-table th, .report-table td {
-        border: 1px solid #cbd5e0;
-        padding: 8px 10px;
-        font-size: 0.95rem;
+    .tabla-evaluacion th, .tabla-evaluacion td {
+        border: 1px solid #e2e8f0;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.9rem;
     }
 
-    .report-table th {
+    .tabla-evaluacion th {
         background-color: #edf2f7;
         color: #2d3748;
-        font-weight: 600;
     }
 
-    .section-title {
-        font-size: 1.15rem;
-        margin-top: 25px;
-        margin-bottom: 12px;
-        border-bottom: 2px solid #3182ce;
-        padding-bottom: 4px;
-        color: #1a365d;
+    .signature-pad-container {
+        border: 2px dashed #cbd5e0;
+        background: #f7fafc;
+        border-radius: 6px;
+        padding: 10px;
+        text-align: center;
     }
 
-    /* REGLAS DE IMPRESIÓN (PDF / A4) */
+    canvas {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        cursor: crosshair;
+    }
+
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-save { background: #3182ce; color: white; }
+    .btn-print { background: #38a169; color: white; text-decoration: none; display: inline-block; }
+
+    /* Encabezado especial solo activo al imprimir */
+    .print-only-header {
+        display: none;
+    }
+
+
+    /* =======================================================
+       2. ESTILOS DE IMPRESIÓN (SOLO PARA HOJA DE PAPEL / PDF)
+       ======================================================= */
     @media print {
+        /* Configuración de Hoja A4 y Márgenes reducidos */
         @page {
             size: A4 portrait;
             margin: 12mm 15mm 12mm 15mm;
         }
 
-        body {
-            background: white !important;
-            color: #000 !important;
-            font-size: 11pt !important;
-        }
-
-        /* Ocultar elementos no imprimibles */
-        .no-print, 
-        nav, 
-        header, 
-        footer, 
-        .btn-action,
-        #clear-signature,
-        .sidebar {
+        /* Ocultar elementos de navegación de la App */
+        nav, header, footer, .navbar, .sidebar, .btn-action, .no-print, button {
             display: none !important;
         }
 
-        .seguimiento-container {
+        body {
+            background: white !important;
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 9.5pt !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .ficha-container {
             max-width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
         }
 
-        .section-block {
-            page-break-inside: avoid;
+        /* Ocultar Encabezado Web */
+        .header-ficha {
+            display: none !important;
         }
 
-        /* Convertir inputs y selects en apariencia de texto plano para impresión */
-        input[type="text"], 
-        input[type="number"], 
-        select, 
-        textarea {
+        /* Mostrar Encabezado Oficial de Impresión */
+        .print-only-header {
+            display: block !important;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .print-only-header table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .print-only-header td {
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .print-title {
+            font-size: 13pt !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .print-subtitle {
+            font-size: 9pt;
+            color: #333;
+            margin-top: 3px;
+        }
+
+        /* Remoción de Cajas y Sombras - Estilo Documento Oficial */
+        .card-seccion {
+            border: none !important;
+            padding: 0 !important;
+            margin-bottom: 10px !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        .card-title {
+            font-size: 10pt !important;
+            color: #000 !important;
+            border-bottom: 1px solid #000 !important;
+            padding-bottom: 2px !important;
+            margin-bottom: 6px !important;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Reemplazo de Textareas y Entradas por Texto Limpio */
+        .form-control, textarea {
+            border: none !important;
+            padding: 0 !important;
+            font-size: 9.5pt !important;
+            background: transparent !important;
+            resize: none !important;
+            box-shadow: none !important;
+            appearance: none;
+            width: 100% !important;
+        }
+
+        /* Cuadros de Observaciones Simplificados con Línea o Borde Fino */
+        .observaciones-box-print {
+            border: 1px solid #888 !important;
+            padding: 6px 8px !important;
+            border-radius: 0 !important;
+            min-height: 45px;
+            font-size: 9pt !important;
+            line-height: 1.3;
+        }
+
+        /* Tablas de Evaluación Limpias */
+        .tabla-evaluacion {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin-top: 5px !important;
+        }
+
+        .tabla-evaluacion th {
+            background-color: #f0f0f0 !important;
+            color: #000 !important;
+            border: 1px solid #000 !important;
+            padding: 4px 6px !important;
+            font-size: 8.5pt !important;
+            text-transform: uppercase;
+        }
+
+        .tabla-evaluacion td {
+            border: 1px solid #000 !important;
+            padding: 4px 6px !important;
+            font-size: 9pt !important;
+        }
+
+        /* CORRECCIÓN DE FIRMA ELECTRÓNICA */
+        .signature-pad-container {
             border: none !important;
             background: transparent !important;
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            box-shadow: none !important;
-            padding: 2px !important;
+            padding: 0 !important;
+            text-align: center !important;
         }
 
-        /* Mostrar valores seleccionados claramente */
-        input[type="radio"] {
-            accent-color: #000;
+        /* Ocultar el lienzo interactivo al imprimir */
+        #signature-pad {
+            display: none !important;
         }
 
-        .report-info {
-            border-left: 4px solid #000 !important;
-            background: #f8f9fa !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+        /* Mostrar solo el trazo de la firma limpia sobre una línea */
+        .firma-print-render {
+            display: block !important;
+            max-height: 45px !important;
+            width: auto !important;
+            margin: 0 auto !important;
         }
 
-        .report-table th {
-            background-color: #f1f5f9 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+        .linea-firma {
+            border-top: 1px solid #000 !important;
+            width: 220px;
+            margin: 30px auto 3px auto;
+            text-align: center;
+        }
+
+        .texto-firma {
+            font-size: 8.5pt !important;
+            color: #000 !important;
+            text-align: center;
         }
     }
 </style>
 
-<div class="seguimiento-container">
+<div class="ficha-container">
 
-    <!-- ENCABEZADO Y BOTONES DE ACCIÓN -->
-    <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1 class="page-title" style="margin: 0; font-size: 1.6rem; color: #2b6cb0;">Ficha de Seguimiento Individual</h1>
-        
-        <div class="no-print" style="display: flex; gap: 10px; align-items: center;">
-            <a href="/alumnos" class="btn-secondary" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; background: #e2e8f0; color: #2d3748; font-weight: 500;">
-                Volver
-            </a>
-            <button type="button" onclick="window.print()" style="padding: 8px 16px; border: none; border-radius: 4px; background: #3182ce; color: white; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                🖨️ Imprimir Ficha
-            </button>
-        </div>
+    <!-- BOTONES DE ACCIÓN (Se ocultan al imprimir) -->
+    <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <a href="{{ url_for('seguimiento_seleccion') }}" style="color: #4a5568; text-decoration: none; font-size: 0.9rem;">
+            ← Volver a la lista
+        </a>
+        <button onclick="window.print()" class="btn-action btn-print">
+            🖨️ Imprimir Ficha / Guardar PDF
+        </button>
     </div>
 
-    <!-- CREDENCIALES DEL ALUMNO -->
-    <div class="report-info" style="background: #f7fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #3182ce; margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-            <p style="margin: 2px 0;"><strong>Alumno:</strong> {{ alumno.apellido }}, {{ alumno.nombre }}</p>
-            <p style="margin: 2px 0;"><strong>Grado:</strong> {{ alumno.grado_nombre }}</p>
-            <p style="margin: 2px 0;"><strong>Escuela:</strong> {{ alumno.escuela_nombre if alumno.escuela_nombre else 'General' }}</p>
-        </div>
+    <!-- ENCABEZADO EXCLUSIVO PARA IMPRESIÓN (Aparece únicamente en papel) -->
+    <div class="print-only-header">
+        <table>
+            <tr>
+                <td>
+                    <h1 class="print-title">FICHA DE SEGUIMIENTO PEDAGÓGICO INDIVIDUAL</h1>
+                    <div class="print-subtitle">
+                        <strong>Escuela:</strong> {{ alumno.escuela_nombre if alumno.escuela_nombre else 'N° S/D' }} | 
+                        <strong>Grado/Curso:</strong> {{ alumno.grado_nombre if alumno.grado_nombre else 'S/D' }} | 
+                        <strong>Año Lectivo:</strong> 2026
+                    </div>
+                </td>
+                <td style="text-align: right; vertical-align: top; font-size: 8.5pt;">
+                    <strong>Fecha:</strong> {{ fecha_actual if fecha_actual else '___/___/2026' }}
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <form method="POST" id="formSeguimiento">
-        {% if csrf_token %}
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% endif %}
+    <!-- ENCABEZADO PANTALLA (Se oculta al imprimir) -->
+    <div class="header-ficha">
+        <h2 style="margin: 0; font-size: 1.4rem;">Ficha de Seguimiento Individual</h2>
+        <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">
+            Estudiante: <strong>{{ alumno.apellido }}, {{ alumno.nombre }}</strong>
+        </p>
+    </div>
 
-        <input type="hidden" name="grado_id" value="{{ alumno.grado_id }}">
-        <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+    <form id="formSeguimiento" action="" method="POST">
 
-        <!-- PERÍODO O MES -->
-        <div class="section-block" style="margin-bottom: 20px;">
-            <label for="mes"><strong>Mes / Período:</strong></label>
-            <input 
-                type="text" 
-                id="mes" 
-                name="mes" 
-                value="{{ seguimiento.mes if seguimiento else '' }}" 
-                placeholder="Ej: Marzo 2026"
-                required 
-                style="padding: 6px 10px; border-radius: 4px; border: 1px solid #cbd5e0; margin-left: 10px; width: 200px;"
-            >
-        </div>
-
-        <!-- 1. ASISTENCIA Y PUNTUALIDAD -->
-        <div class="section-block">
-            <h2 class="section-title">1. Asistencia y Puntualidad</h2>
-            <div style="overflow-x: auto;">
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left;">Semana</th>
-                            <th style="text-align: center; width: 110px;">Asistencias</th>
-                            <th style="text-align: center; width: 110px;">Inasistencias</th>
-                            <th style="text-align: center; width: 110px;">Llegadas Tarde</th>
-                            <th style="text-align: left;">Observaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in range(1, 5) %}
-                        <tr>
-                            <td><strong>Semana {{ i }}</strong></td>
-                            <td style="text-align: center;">
-                                <input type="number" class="calc-asist" name="asistencias_s{{ i }}" value="{{ seguimiento['asistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="number" class="calc-inasist" name="inasistencias_s{{ i }}" value="{{ seguimiento['inasistencias_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="number" class="calc-tard" name="tardanzas_s{{ i }}" value="{{ seguimiento['tardanzas_s' ~ i] if seguimiento else 0 }}" min="0" style="width: 50px; text-align: center;">
-                            </td>
-                            <td>
-                                <input type="text" name="obs_s{{ i }}" value="{{ seguimiento['obs_s' ~ i] if seguimiento else '' }}" placeholder="Observación..." style="width: 98%;">
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr style="background: #f7fafc; font-weight: bold;">
-                            <td>Total Mes</td>
-                            <td id="total-asistencias" style="text-align: center;">0</td>
-                            <td id="total-inasistencias" style="text-align: center;">0</td>
-                            <td id="total-tardanzas" style="text-align: center;">0</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-
-        <!-- 2. DESEMPEÑO ACADÉMICO Y TRABAJO EN AULA -->
-        <div class="section-block">
-            <h2 class="section-title">2. Desempeño Académico y Trabajo en Aula</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px;">
-                <div>
-                    <label for="participacion"><strong>Participación en Clase:</strong></label>
-                    <select id="participacion" name="participacion" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
-                        <option value="">Seleccionar...</option>
-                        {% set part_val = seguimiento.participacion if seguimiento else '' %}
-                        <option value="Muy Activa" {{ 'selected' if part_val == 'Muy Activa' }}>Muy Activa</option>
-                        <option value="Regular" {{ 'selected' if part_val == 'Regular' }}>Regular</option>
-                        <option value="Poco Participativo" {{ 'selected' if part_val == 'Poco Participativo' }}>Poco Participativo</option>
-                    </select>
+        <!-- SECCIÓN 1: DATOS DEL ESTUDIANTE -->
+        <div class="card-seccion">
+            <div class="card-title">1. Datos del Estudiante</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Apellido y Nombre:</label>
+                    <input type="text" class="form-control" value="{{ alumno.apellido }}, {{ alumno.nombre }}" readonly>
                 </div>
-
-                <div>
-                    <label for="entrega_tareas"><strong>Entrega de Tareas:</strong></label>
-                    <select id="entrega_tareas" name="entrega_tareas" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
-                        <option value="">Seleccionar...</option>
-                        {% set tareas_val = seguimiento.entrega_tareas if seguimiento else '' %}
-                        <option value="Siempre a Tiempo" {{ 'selected' if tareas_val == 'Siempre a Tiempo' }}>Siempre a Tiempo</option>
-                        <option value="A veces Incompleto" {{ 'selected' if tareas_val == 'A veces Incompleto' }}>A veces Incompleto</option>
-                        <option value="Rara vez Entrega" {{ 'selected' if tareas_val == 'Rara vez Entrega' }}>Rara vez Entrega</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="comprension_contenidos"><strong>Comprensión de Contenidos:</strong></label>
-                    <select id="comprension_contenidos" name="comprension_contenidos" required style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #cbd5e0;">
-                        <option value="">Seleccionar...</option>
-                        {% set comp_val = seguimiento.comprension_contenidos if seguimiento else '' %}
-                        <option value="Excelente" {{ 'selected' if comp_val == 'Excelente' }}>Excelente</option>
-                        <option value="En Proceso" {{ 'selected' if comp_val == 'En Proceso' }}>En Proceso</option>
-                        <option value="Requiere Apoyo Extra" {{ 'selected' if comp_val == 'Requiere Apoyo Extra' }}>Requiere Apoyo Extra</option>
-                    </select>
+                <div class="form-group">
+                    <label>DNI:</label>
+                    <input type="text" class="form-control" value="{{ alumno.dni if alumno.dni else 'Sin registrar' }}" readonly>
                 </div>
             </div>
         </div>
 
-        <!-- 3. CONDUCTA Y CONVIVENCIA -->
-        <div class="section-block">
-            <h2 class="section-title">3. Conducta y Convivencia</h2>
-            <table class="report-table">
+        <!-- SECCIÓN 2: EVALUACIÓN Y CRITERIOS -->
+        <div class="card-seccion">
+            <div class="card-title">2. Valoración Pedagógica y Desempeño</div>
+            
+            <table class="tabla-evaluacion">
                 <thead>
                     <tr>
-                        <th style="text-align: left;">Criterio</th>
-                        <th style="text-align: center; width: 90px;">Siempre</th>
-                        <th style="text-align: center; width: 90px;">A veces</th>
-                        <th style="text-align: center; width: 90px;">Nunca</th>
+                        <th style="text-align: left;">Criterio de Evaluación</th>
+                        <th style="width: 100px;">Logrado</th>
+                        <th style="width: 100px;">En Proceso</th>
+                        <th style="width: 100px;">A Fortalecer</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% set criterios = [
-                        ('respeta_normas', 'Respeta las normas de la institución'),
-                        ('trabaja_en_equipo', 'Demuestra disposición para el trabajo en equipo'),
-                        ('mantiene_respeto', 'Mantiene un trato respetuoso hacia compañeros y docentes')
-                    ] %}
-                    {% for campo, texto in criterios %}
-                    {% set campo_val = seguimiento[campo] if seguimiento else '' %}
                     <tr>
-                        <td>{{ texto }}</td>
-                        <td style="text-align: center;">
-                            <input type="radio" name="{{ campo }}" value="Siempre" required {{ 'checked' if campo_val == 'Siempre' }}>
-                        </td>
-                        <td style="text-align: center;">
-                            <input type="radio" name="{{ campo }}" value="A veces" {{ 'checked' if campo_val == 'A veces' }}>
-                        </td>
-                        <td style="text-align: center;">
-                            <input type="radio" name="{{ campo }}" value="Nunca" {{ 'checked' if campo_val == 'Nunca' }}>
-                        </td>
+                        <td style="text-align: left;">Comprensión lectora y expresión oral</td>
+                        <td><input type="radio" name="crit_1" value="L" checked></td>
+                        <td><input type="radio" name="crit_1" value="EP"></td>
+                        <td><input type="radio" name="crit_1" value="AF"></td>
                     </tr>
-                    {% endfor %}
+                    <tr>
+                        <td style="text-align: left;">Resolución de problemas matemáticos</td>
+                        <td><input type="radio" name="crit_2" value="L"></td>
+                        <td><input type="radio" name="crit_2" value="EP" checked></td>
+                        <td><input type="radio" name="crit_2" value="AF"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Cumplimiento de tareas y hábitos de estudio</td>
+                        <td><input type="radio" name="crit_3" value="L" checked></td>
+                        <td><input type="radio" name="crit_3" value="EP"></td>
+                        <td><input type="radio" name="crit_3" value="AF"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Convivencia y trabajo colaborativo</td>
+                        <td><input type="radio" name="crit_4" value="L" checked></td>
+                        <td><input type="radio" name="crit_4" value="EP"></td>
+                        <td><input type="radio" name="crit_4" value="AF"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- 4. OBSERVACIONES GENERALES Y EVOLUCIÓN -->
-        <div class="section-block">
-            <h2 class="section-title">4. Observaciones Generales y Evolución</h2>
-            <textarea 
-                name="observaciones_generales" 
-                rows="4" 
-                style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #cbd5e0; font-family: inherit; box-sizing: border-box; resize: vertical;" 
-                placeholder="Escriba el informe cualitativo del estudiante..."
-            >{{ seguimiento.observaciones_generales if seguimiento else '' }}</textarea>
-        </div>
-
-        <!-- 5. FIRMA ELECTRÓNICA DEL DOCENTE -->
-        <div class="section-block">
-            <h2 class="section-title">5. Firma del Docente</h2>
-
-            <p class="no-print" style="margin-top: 5px; font-size: 0.85rem; color: #718096;">
-                Dibuje su firma con el dedo en la pantalla táctil o con el puntero del mouse:
-            </p>
-
-            <div style="margin-top: 10px; text-align: center;">
-                <div style="border: 2px dashed #a0aec0; background: #fafafa; display: inline-block; border-radius: 8px; width: 100%; max-width: 400px; touch-action: none;">
-                    <canvas id="signature-pad" style="width: 100%; height: 150px; display: block;"></canvas>
-                </div>
-                <br>
-                <button 
-                    type="button" 
-                    id="clear-signature" 
-                    class="no-print"
-                    style="margin-top: 8px; padding: 5px 12px; background: #718096; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;"
-                >
-                    Limpiar Firma
-                </button>
+        <!-- SECCIÓN 3: OBSERVACIONES Y SUGERENCIAS -->
+        <div class="card-seccion">
+            <div class="card-title">3. Observaciones del Docente / Criterios de Acompañamiento</div>
+            <div class="observaciones-box-print">
+                <textarea class="form-control" name="observaciones" rows="3" placeholder="Escriba aquí las observaciones pedagógicas..."></textarea>
             </div>
         </div>
 
-        <!-- Campo donde se inserta el Base64 de la firma -->
-        <input type="hidden" name="firma_base64" id="firma_base64" value="{{ seguimiento.firma_base64 if seguimiento else '' }}">
+        <!-- SECCIÓN 4: FIRMA DIGITAL -->
+        <div class="card-seccion">
+            <div class="card-title">4. Conformidad del Docente / Evaluador</div>
+            
+            <div class="signature-pad-container">
+                <!-- Lienzo para firmar (Web) -->
+                <canvas id="signature-pad" width="400" height="120" class="no-print"></canvas>
+                
+                <div class="no-print" style="margin-top: 5px;">
+                    <button type="button" onclick="clearSignature()" style="background: #e2e8f0; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                        🗑️ Limpiar Firma
+                    </button>
+                </div>
 
-        <!-- BOTONES DE ACCIÓN (SOLO PANTALLA) -->
-        <div class="no-print" style="margin-top: 35px; margin-bottom: 30px; text-align: center;">
-            <button class="primary-btn" type="submit" style="padding: 12px 35px; font-size: 1.05rem; cursor: pointer; background: #2b6cb0; color: white; border: none; border-radius: 5px; font-weight: bold;">
-                Guardar Seguimiento
+                <!-- Render de la firma para IMPRESIÓN (Sin cajas grises) -->
+                <div class="linea-firma">
+                    <img id="signature-image-print" class="firma-print-render" src="" alt="Firma Docente" style="display: none;">
+                    <div class="texto-firma">
+                        <strong>Firma y Aclaración del Docente</strong><br>
+                        <span style="font-size: 8pt; color: #555;">Documento firmado digitalmente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÓN GUARDAR (Web) -->
+        <div class="no-print" style="text-align: right; margin-top: 20px;">
+            <button type="submit" class="btn-action btn-save">
+                💾 Guardar Ficha
             </button>
         </div>
 
     </form>
 </div>
 
-<!-- CDN SignaturePad -->
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<!-- SCRIPT PARA EL CANVAS DE LA FIRMA -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const canvas = document.getElementById('signature-pad');
-        const signaturePad = new SignaturePad(canvas, {
-            backgroundColor: 'rgb(255, 255, 255)',
-            penColor: 'rgb(0, 0, 128)'
-        });
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    const printImg = document.getElementById('signature-image-print');
+    let isDrawing = false;
 
-        function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext("2d").scale(ratio, ratio);
-            
-            const savedFirma = document.getElementById('firma_base64').value;
-            if (savedFirma) {
-                signaturePad.fromDataURL(savedFirma);
-            } else {
-                signaturePad.clear();
-            }
-        }
+    // Configuración del trazo de firma
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
 
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
+    function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+    }
 
-        document.getElementById('clear-signature').addEventListener('click', function () {
-            signaturePad.clear();
-            document.getElementById('firma_base64').value = "";
-        });
+    function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+        // Al terminar de firmar, actualizamos la imagen que se usará para imprimir
+        updatePrintSignature();
+    }
 
-        // Cálculo dinámico de totales de asistencia
-        function calcularTotales() {
-            const sumarClase = (clase) => {
-                let total = 0;
-                document.querySelectorAll('.' + clase).forEach(input => {
-                    total += parseInt(input.value) || 0;
-                });
-                return total;
-            };
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
-            document.getElementById('total-asistencias').innerText = sumarClase('calc-asist');
-            document.getElementById('total-inasistencias').innerText = sumarClase('calc-inasist');
-            document.getElementById('total-tardanzas').innerText = sumarClase('calc-tard');
-        }
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
 
-        document.querySelectorAll('.calc-asist, .calc-inasist, .calc-tard').forEach(input => {
-            input.addEventListener('input', calcularTotales);
-        });
-        calcularTotales();
+    function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        printImg.style.display = 'none';
+        printImg.src = '';
+    }
 
-        // Validar al enviar el formulario
-        document.getElementById('formSeguimiento').addEventListener('submit', function (e) {
-            if (signaturePad.isEmpty()) {
-                alert("Por favor, realice la firma antes de guardar.");
-                e.preventDefault();
-                return false;
-            }
-            document.getElementById('firma_base64').value = signaturePad.toDataURL();
-        });
-    });
+    function updatePrintSignature() {
+        const dataURL = canvas.toDataURL('image/png');
+        printImg.src = dataURL;
+        printImg.style.display = 'block';
+    }
+
+    // Eventos Mouse
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+
+    // Eventos Táctiles (Celulares / Tablets)
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchmove', draw);
 </script>
 
 {% endblock %}
