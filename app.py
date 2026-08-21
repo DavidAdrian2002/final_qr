@@ -1706,8 +1706,6 @@ def seguimiento_seleccion():
     if "docente_id" not in session:
         return redirect("/login")
 
-    docente_id = session["docente_id"]
-
     # Captura de parámetros GET para los filtros
     escuela_id = request.args.get("escuela_id", type=int)
     grado_id = request.args.get("grado_id", type=int)
@@ -1716,8 +1714,8 @@ def seguimiento_seleccion():
     cursor = conn.cursor()
     ph = "%s" if DATABASE_URL else "?"
 
-    # 1. Obtener las escuelas pertenecientes al docente
-    cursor.execute(f"SELECT id, nombre, numero FROM escuelas WHERE docente_id = {ph} ORDER BY nombre", (docente_id,))
+    # 1. Obtener todas las escuelas (sin filtrar por docente_id directamente en escuelas)
+    cursor.execute("SELECT id, nombre, numero FROM escuelas ORDER BY nombre")
     escuelas = cursor.fetchall()
 
     grados = []
