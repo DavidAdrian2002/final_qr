@@ -462,31 +462,41 @@ def vista_alumnos():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # 1. Obtener las escuelas del docente
-    cursor.execute("SELECT * FROM escuelas WHERE docente_id = %s", (docente_id,))
+    # 1. Obtener las escuelas del docente uniendo con docente_escuelas
+    cursor.execute("""
+        SELECT e.* 
+        FROM escuelas e
+        JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = %s
+    """, (docente_id,))
     escuelas = cursor.fetchall()
 
-    # 2. Obtener los grados del docente (o filtrados por escuela si seleccionó una)
+    # 2. Obtener los grados del docente
     if escuela_id:
         cursor.execute("SELECT * FROM grados WHERE escuela_id = %s", (escuela_id,))
     else:
         cursor.execute("""
-            SELECT g.* FROM grados g
+            SELECT g.* 
+            FROM grados g
             JOIN escuelas e ON g.escuela_id = e.id
-            WHERE e.docente_id = %s
+            JOIN docente_escuelas de ON e.id = de.escuela_id
+            WHERE de.docente_id = %s
         """, (docente_id,))
     
     grados = cursor.fetchall()
 
-    # 3. Obtener los alumnos del grado seleccionado (si hay uno activo)
+    # 3. Obtener los alumnos del grado seleccionado
     alumnos = []
     if grado_id:
-        cursor.execute("SELECT * FROM alumnos WHERE grado_id = %s ORDER BY apellido, nombre", (grado_id,))
+        cursor.execute("""
+            SELECT * FROM alumnos 
+            WHERE grado_id = %s 
+            ORDER BY apellido, nombre
+        """, (grado_id,))
         alumnos = cursor.fetchall()
 
     conn.close()
 
-    # IMPORTANTE: Asegúrate de pasar `grados=grados` en el render_template
     return render_template(
         "alumnos.html",
         escuelas=escuelas,
