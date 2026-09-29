@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Alumnos - IA{% endblock %}
+
+{% block content %}
+<div class="confirm-wrapper">
+    <div class="confirm-header">
+        <h1 class="page-title"><i data-lucide="check-circle-2"></i> Revisar Alumnos Extraídos</h1>
+        <p class="page-subtitle">La IA detectó {{ alumnos|length }} alumnos. Revisa la lista y edita si es necesario antes de guardar.</p>
+    </div>
+
+    <form action="/alumnos/guardar-masivo" method="POST" class="confirm-form">
+        <input type="hidden" name="grado_id" value="{{ grado_id }}">
+
+        <div class="table-container glass-card">
+            <table class="ia-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre(s)</th>
+                        <th>Apellido(s)</th>
+                        <th>Sexo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    {% for alumno in alumnos %}
+                    <tr class="alumno-row">
+                        <td class="row-number">{{ loop.index }}</td>
+                        <td>
+                            <input type="text" name="nombre[]" value="{{ alumno.nombre }}" class="glass-input-table" required>
+                        </td>
+                        <td>
+                            <input type="text" name="apellido[]" value="{{ alumno.apellido }}" class="glass-input-table" required>
+                        </td>
+                        <td>
+                            <select name="sexo[]" class="glass-input-table">
+                                <option value="M" {% if alumno.sexo == 'M' %}selected{% endif %}>M</option>
+                                <option value="F" {% if alumno.sexo == 'F' %}selected{% endif %}>F</option>
+                            </select>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn-delete-row" onclick="eliminarFila(this)">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="confirm-actions">
+            <button type="button" class="btn-secondary" onclick="agregarFilaVacia()">
+                <i data-lucide="user-plus"></i> + Agregar Fila
+            </button>
+            <button type="submit" class="btn-success">
+                <i data-lucide="save"></i> Confirmar y Guardar Todos
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function eliminarFila(btn) {
+    const row = btn.closest('tr');
+    row.remove();
+    actualizarNumeracion();
+}
+
+function agregarFilaVacia() {
+    const tbody = document.getElementById('tabla-body');
+    const tr = document.createElement('tr');
+    tr.className = 'alumno-row';
+    tr.innerHTML = `
+        <td class="row-number"></td>
+        <td><input type="text" name="nombre[]" class="glass-input-table" placeholder="Nombre" required></td>
+        <td><input type="text" name="apellido[]" class="glass-input-table" placeholder="Apellido" required></td>
+        <td>
+            <select name="sexo[]" class="glass-input-table">
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn-delete-row" onclick="eliminarFila(this)">
+                <i data-lucide="trash-2"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    actualizarNumeracion();
+    if (window.lucide) lucide.createIcons();
+}
+
+function actualizarNumeracion() {
+    document.querySelectorAll('.row-number').forEach((td, index) => {
+        td.textContent = index + 1;
+    });
+}
+</script>
+{% endblock %}

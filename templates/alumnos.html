@@ -16,6 +16,10 @@ Alumnos
         <a class="primary-btn add-btn" href="/alumnos/nuevo">
             <span>➕</span> Nuevo Alumno
         </a>
+        <button type="button" class="btn-ia" onclick="abrirModalIA()">
+    <i data-lucide="sparkles"></i>
+    <span>Cargar Lista con IA</span>
+</button>
     </div>
 
     <!-- Mensajes Flasheados -->
@@ -103,4 +107,51 @@ Alumnos
     {% endif %}
 
 </div>
+<!-- Modal de Carga Masiva con IA -->
+<div id="modal-ia" class="modal-overlay" style="display: none;">
+    <div class="modal-content glass-card">
+        <div class="modal-header">
+            <h2><i data-lucide="sparkles"></i> Escanear Lista con IA</h2>
+            <button type="button" class="btn-close" onclick="cerrarModalIA()">✕</button>
+        </div>
+
+        <form action="/alumnos/carga-masiva-ia" method="POST" enctype="multipart/form-data" class="ia-form">
+            <input type="hidden" name="escuela_id" value="{{ escuela_id_seleccionada }}">
+            
+            <div class="form-group">
+                <label for="grado_id_ia">Selecciona el Grado / Curso:</label>
+                <select name="grado_id" id="grado_id_ia" required class="glass-input">
+                    {% for grado in grados %}
+                    <option value="{{ grado.id }}">{{ grado.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="upload-area" id="drop-zone">
+                <i data-lucide="file-up" class="upload-icon"></i>
+                <p>Sube un archivo <strong>PDF, Excel o Imagen</strong></p>
+                <span class="upload-hint">O toma una foto a la lista en papel desde tu celular</span>
+                
+                <input type="file" name="archivo" id="archivo-ia" accept="image/*,.pdf,.xlsx,.csv,.docx" capture="environment" required>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="cerrarModalIA()">Cancelar</button>
+                <button type="submit" class="btn-primary" id="btn-procesar-ia">
+                    <i data-lucide="cpu"></i> Analizar Lista
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalIA() {
+    document.getElementById('modal-ia').style.display = 'flex';
+    if (window.lucide) lucide.createIcons();
+}
+function cerrarModalIA() {
+    document.getElementById('modal-ia').style.display = 'none';
+}
+</script>
 {% endblock %}

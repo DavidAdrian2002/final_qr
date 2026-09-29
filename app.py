@@ -1,5 +1,8 @@
 import uuid
 import os
+import os
+import secrets  # Para generar los qr_tokens únicos de cada alumno
+
 
 from utils.qr import generar_qr
 from flask import send_file
@@ -9,6 +12,8 @@ from docx import Document
 from docx.shared import Inches
 from flask import *
 from utils.db import *
+from flask import request, render_template, redirect, url_for, session, flash
+from servicios_ia import procesar_documento_alumnos
 
 from werkzeug.security import (
     generate_password_hash,
@@ -1697,6 +1702,89 @@ def seguimiento_alumno(alumno_id):
         }
 
     return render_template("seguimiento_alumno.html", alumno=alumno)
+
+@app.route("/alumnos/carga-masiva-ia", methods=["POST"])
+def carga_masiva_ia():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    escuela_id = request.form.get("escuela_id")
+    grado_id = request.form.get("grado_id")
+    archivo = request.files.get("archivo")
+
+    if not archivo or not grado_id:
+        return "Error: Debe seleccionar un grado y subir un archivo válido.", 400
+
+    # Crear carpeta temporal de subidas si no existe
+    upload_dir = os.path.join(app.root_path, "static", "uploads_temp")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Guardar el archivo recibido temporalmente
+    temp_filepath = os.path.join(upload_dir, secrets.token_hex(8) + "_" + archivo.filename)
+    archivo.save(temp_filepath)
+
+    try:
+        # Llamar a la función con IA de Gemini
+        alumnos_extraidos = procesar_documento_alumnos(temp_filepath)
+
+        # Eliminar el archivo temporal local
+        if os.path.exists(temp_filepath):
+            os.remove(temp_filepath)
+
+        # Renderizar la plantilla de revisión con la lista extraída
+        return render_template(
+            "confirmar_alumnos_ia.html",
+            alumnos=alumnos_extraidos,
+            escuela_id=escuela_id,
+            grado_id=grado_id
+        )
+
+    except Exception as e:
+        if os.path.exists(temp_filepath):
+            os.remove(temp_filepath)
+        return f"Ocurrió un error al analizar el documento con la IA: {str(e)}", 500
+@app.route("/alumnos/guardar-masivo", methods=["POST"])
+def guardar_masivo():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    grado_id = request.form.get("grado_id")
+    
+    # Obtenemos las listas de campos enviados desde el formulario editable
+    nombres = request.form.getlist("nombre[]")
+    apellidos = request.form.getlist("apellido[]")
+    sexos = request.form.getlist("sexo[]")
+
+    if not nombres or not grado_id:
+        return redirect("/alumnos")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    for i in range(len(nombres)):
+        nom = nombres[i].strip()
+        ape = apellidos[i].strip()
+        sex = sexos[i].strip()
+
+        # Si el usuario dejó la fila vacía en la tabla, la omitimos
+        if not nom or not ape:
+            continue
+
+        # Generar un token único irrepetible para el código QR del alumno
+        qr_token = secrets.token_hex(16)
+
+        cursor.execute("""
+            INSERT INTO alumnos (nombre, apellido, sexo, grado_id, qr_token)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nom, ape, sex, int(grado_id), qr_token))
+
+    conn.commit()
+    conn.close()
+
+    # Redirigir al listado de alumnos del grado correspondiente
+    return redirect(f"/alumnos?grado_id={grado_id}")
+    
+    
 
 # =========================
 # SELECCIÓN Y FILTRO DE SEGUIMIENTO (Pantalla Previa)
