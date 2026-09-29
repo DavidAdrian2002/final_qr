@@ -7,3 +7,4 @@ Pillow
 python-docx
 reportlab
 openpyxl
+google-genai
