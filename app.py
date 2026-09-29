@@ -462,7 +462,7 @@ def vista_alumnos():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # 1. Obtener las escuelas del docente uniendo con docente_escuelas
+    # 1. Obtener las escuelas del docente
     cursor.execute("""
         SELECT e.* 
         FROM escuelas e
@@ -471,7 +471,7 @@ def vista_alumnos():
     """, (docente_id,))
     escuelas = cursor.fetchall()
 
-    # 2. Obtener los grados del docente
+    # 2. Obtener los grados del docente (o filtrados por escuela)
     if escuela_id:
         cursor.execute("SELECT * FROM grados WHERE escuela_id = %s", (escuela_id,))
     else:
@@ -482,19 +482,36 @@ def vista_alumnos():
             JOIN docente_escuelas de ON e.id = de.escuela_id
             WHERE de.docente_id = %s
         """, (docente_id,))
-    
     grados = cursor.fetchall()
 
-    # 3. Obtener los alumnos del grado seleccionado
-    alumnos = []
+    # 3. Obtener los alumnos según los filtros activos
     if grado_id:
+        # Filtrar solo por el grado seleccionado
         cursor.execute("""
             SELECT * FROM alumnos 
-            WHERE grado_id = %s 
+            WHERE grado_id = %s AND activo = 1 
             ORDER BY apellido, nombre
         """, (grado_id,))
-        alumnos = cursor.fetchall()
+    elif escuela_id:
+        # Filtrar por todos los grados de la escuela seleccionada
+        cursor.execute("""
+            SELECT a.* FROM alumnos a
+            JOIN grados g ON a.grado_id = g.id
+            WHERE g.escuela_id = %s AND a.activo = 1
+            ORDER BY a.apellido, a.nombre
+        """, (escuela_id,))
+    else:
+        # Mostrar TODOS los alumnos de TODAS las escuelas del docente
+        cursor.execute("""
+            SELECT a.* FROM alumnos a
+            JOIN grados g ON a.grado_id = g.id
+            JOIN escuelas e ON g.escuela_id = e.id
+            JOIN docente_escuelas de ON e.id = de.escuela_id
+            WHERE de.docente_id = %s AND a.activo = 1
+            ORDER BY a.apellido, a.nombre
+        """, (docente_id,))
 
+    alumnos = cursor.fetchall()
     conn.close()
 
     return render_template(
