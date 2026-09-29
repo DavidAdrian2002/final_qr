@@ -451,50 +451,50 @@ def eliminar_grado(id):
 # ALUMNOS
 # =========================
 @app.route("/alumnos")
-def alumnos():
-
+def vista_alumnos():
     if "docente_id" not in session:
         return redirect("/login")
+
+    docente_id = session["docente_id"]
+    escuela_id = request.args.get("escuela_id")
+    grado_id = request.args.get("grado_id")
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-    SELECT
-        alumnos.*,
-        grados.nombre as grado_nombre,
-        escuelas.nombre as escuela_nombre
+    # 1. Obtener las escuelas del docente
+    cursor.execute("SELECT * FROM escuelas WHERE docente_id = %s", (docente_id,))
+    escuelas = cursor.fetchall()
 
-    FROM alumnos
+    # 2. Obtener los grados del docente (o filtrados por escuela si seleccionó una)
+    if escuela_id:
+        cursor.execute("SELECT * FROM grados WHERE escuela_id = %s", (escuela_id,))
+    else:
+        cursor.execute("""
+            SELECT g.* FROM grados g
+            JOIN escuelas e ON g.escuela_id = e.id
+            WHERE e.docente_id = %s
+        """, (docente_id,))
+    
+    grados = cursor.fetchall()
 
-    INNER JOIN grados
-    ON alumnos.grado_id = grados.id
-
-    INNER JOIN escuelas
-    ON grados.escuela_id = escuelas.id
-
-    INNER JOIN docente_escuelas
-    ON escuelas.id = docente_escuelas.escuela_id
-
-    WHERE docente_escuelas.docente_id = %s
-    AND alumnos.activo = 1
-
-    ORDER BY
-    escuelas.nombre ASC,
-    alumnos.apellido ASC
-
-
-    """, (session["docente_id"],))
-
-    alumnos = cursor.fetchall()
+    # 3. Obtener los alumnos del grado seleccionado (si hay uno activo)
+    alumnos = []
+    if grado_id:
+        cursor.execute("SELECT * FROM alumnos WHERE grado_id = %s ORDER BY apellido, nombre", (grado_id,))
+        alumnos = cursor.fetchall()
 
     conn.close()
 
+    # IMPORTANTE: Asegúrate de pasar `grados=grados` en el render_template
     return render_template(
         "alumnos.html",
-        alumnos=alumnos
+        escuelas=escuelas,
+        grados=grados,
+        alumnos=alumnos,
+        escuela_id_seleccionada=escuela_id,
+        grado_id_seleccionado=grado_id
     )
-
 
 # =========================
 # NUEVO ALUMNO
