@@ -523,6 +523,39 @@ def vista_alumnos():
         grado_id_seleccionado=grado_id
     )
 
+@app.route("/asistencias/eliminar_fecha", methods=["POST"])
+def eliminar_asistencias_fecha():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    grado_id = request.form.get("grado_id")
+    fecha = request.form.get("fecha")
+
+    if not grado_id or not fecha:
+        flash("Faltan datos para eliminar la asistencia.", "danger")
+        return redirect(request.referrer or "/asistencias")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Borra únicamente las asistencias registradas para ese grado en esa fecha
+        cursor.execute("""
+            DELETE FROM asistencias 
+            WHERE grado_id = %s AND fecha = %s
+        """, (grado_id, fecha))
+        
+        conn.commit()
+        flash(f"Se eliminaron las asistencias registradas para el día {fecha}.", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Ocurrió un error al intentar borrar las asistencias: {str(e)}", "danger")
+    finally:
+        conn.close()
+
+    # Redirige de vuelta a la página donde estaba el docente
+    return redirect(request.referrer or "/asistencias")
+
 # =========================
 # NUEVO ALUMNO
 # =========================
