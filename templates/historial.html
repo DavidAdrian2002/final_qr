@@ -52,9 +52,10 @@ Historial
     Descargar PDF
 </a>
 <!-- Botón para eliminar la asistencia del día seleccionado -->
+<!-- Botón para eliminar la asistencia del día seleccionado -->
 {% if request.args.get('grado_id') and request.args.get('fecha') %}
     <form action="/asistencias/eliminar_fecha" method="POST" style="display: inline-block;" 
-          onsubmit="return confirm('¿Estás seguro de que deseas borrar toda la asistencia registrada para el día {{ request.args.get(\'fecha\') }}? Esta acción no se puede deshacer.');">
+          onsubmit="return confirm('¿Estás seguro de que deseas borrar toda la asistencia registrada para el día {{ request.args.get('fecha') }}? Esta acción no se puede deshacer.');">
         
         <input type="hidden" name="grado_id" value="{{ request.args.get('grado_id') }}">
         <input type="hidden" name="fecha" value="{{ request.args.get('fecha') }}">
