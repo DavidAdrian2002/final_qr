@@ -14,6 +14,7 @@ from flask import *
 from utils.db import *
 from flask import request, render_template, redirect, url_for, session, flash
 from servicios_ia import procesar_documento_alumnos
+from werkzeug.utils import secure_filename
 
 from werkzeug.security import (
     generate_password_hash,
@@ -61,6 +62,16 @@ UPLOAD_FOLDER = "static/img/alumnos"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Configurar carpeta para guardar fotos subidas
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 asistencias_temp = {}
@@ -2002,7 +2013,77 @@ def eliminar_evento_calendario(evento_id):
     
     flash("Evento eliminado del calendario.", "success")
     return redirect("/calendario")
-    
+
+@app.route("/perfil", methods=["GET", "POST"])
+def perfil_docente():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        dni = request.form.get("dni")
+        legajo = request.form.get("legajo")
+        titulo = request.form.get("titulo")
+        
+        # Manejo de la foto de perfil
+        foto_path = None
+        if 'foto' in request.files:
+            file = request.files['foto']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(f"docente_{docente_id}_{file.filename}")
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                foto_path = f"/static/uploads/{filename}"
+
+        # Actualizar datos
+        placeholder = "%s" if DATABASE_URL else "?"
+        if foto_path:
+            cursor.execute(f"""
+                UPDATE docentes 
+                SET nombre={placeholder}, apellido={placeholder}, dni={placeholder}, 
+                    legajo={placeholder}, titulo={placeholder}, foto={placeholder}
+                WHERE id={placeholder}
+            """, (nombre, apellido, dni, legajo, titulo, foto_path, docente_id))
+        else:
+            cursor.execute(f"""
+                UPDATE docentes 
+                SET nombre={placeholder}, apellido={placeholder}, dni={placeholder}, 
+                    legajo={placeholder}, titulo={placeholder}
+                WHERE id={placeholder}
+            """, (nombre, apellido, dni, legajo, titulo, docente_id))
+
+        conn.commit()
+        flash("Perfil y credencial actualizados con éxito.", "success")
+        return redirect("/perfil")
+
+    # Obtener datos completos del docente
+    cursor.execute("""
+        SELECT id, nombre, apellido, email, 
+               COALESCE(dni, 'Sin registrar') as dni, 
+               COALESCE(legajo, 'S/D') as legajo, 
+               COALESCE(titulo, 'Docente') as titulo, 
+               COALESCE(foto, '/static/uploads/default-avatar.png') as foto
+        FROM docentes WHERE id = %s
+    """, (docente_id,))
+    docente = cursor.fetchone()
+
+    # Obtener escuelas asociadas para el dorso de la credencial
+    cursor.execute("""
+        SELECT e.nombre as escuela_nombre 
+        FROM escuelas e
+        JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = %s
+    """, (docente_id,))
+    escuelas = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("perfil.html", docente=docente, escuelas=escuelas)
     
 
 # =========================

@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil y Credencial{% endblock %}
+
+{% block content %}
+<style>
+  /* Estilos Credencial 3D Flip */
+  .badge-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 380px;
+    height: 230px;
+    margin: 20px auto;
+    cursor: pointer;
+  }
+
+  .badge-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 18px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .badge-container.flipped .badge-card {
+    transform: rotateY(180deg);
+  }
+
+  .badge-front, .badge-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 18px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  /* Frente - Estilo Licencia Profesional */
+  .badge-front {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .badge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 8px;
+  }
+
+  .badge-header span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #60a5fa;
+    text-transform: uppercase;
+  }
+
+  .badge-body {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .badge-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .badge-info h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #ffffff;
+  }
+
+  .badge-info p {
+    margin: 2px 0;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+  }
+
+  .badge-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+
+  /* Dorso de la credencial */
+  .badge-back {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    transform: rotateY(180deg);
+  }
+
+  .flip-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+
+  /* Layout de la vista */
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .profile-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* ==========================================
+   ESTILOS EXCLUSIVOS PARA IMPRESIÓN (PDF)
+   ========================================== */
+@media print {
+  /* Ocultar todo el contenido de la página excepto la credencial */
+  body * {
+    visibility: hidden;
+  }
+
+  .badge-container, .badge-container * {
+    visibility: visible;
+  }
+
+  /* Posicionar la credencial en la esquina superior izquierda de la hoja */
+  .badge-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 350px !important;
+    height: 220px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .badge-card {
+    box-shadow: none !important;
+  }
+
+  .badge-front {
+    border: 1px solid #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .flip-hint, button, .page-title, .profile-grid > div:last-child {
+    display: none !important;
+  }
+}
+</style>
+
+<h1 class="page-title">🪪 Perfil y Credencial Digital</h1>
+
+<div class="profile-grid">
+    
+    <!-- Columna Izquierda: Credencial Interactiva -->
+    <div>
+        <h3 style="text-align: center; color: #475569; margin-bottom: 5px;">Tu Licencia / Credencial</h3>
+        
+        <div class="badge-container" id="badgeContainer" onclick="this.classList.toggle('flipped')">
+            <div class="badge-card">
+                
+                <!-- FRENTE DE LA CREDENCIAL -->
+                <div class="badge-front">
+                    <div class="badge-header">
+                        <span>Credencial Docente</span>
+                        <span style="color: #10b981;">● Activo</span>
+                    </div>
+
+                    <div class="badge-body">
+                        <img src="{{ docente.foto if isinstance(docente, dict) else docente[7] }}" 
+                             onerror="this.src='https://ui-avatars.com/api/?name={{ docente.nombre if isinstance(docente, dict) else docente[1] }}+{{ docente.apellido if isinstance(docente, dict) else docente[2] }}&background=3b82f6&color=fff'" 
+                             class="badge-photo" alt="Foto Docente">
+                        
+                        <div class="badge-info">
+                            <h2>{{ (docente.apellido if isinstance(docente, dict) else docente[2]) }}, {{ (docente.nombre if isinstance(docente, dict) else docente[1]) }}</h2>
+                            <p><strong>Cargo:</strong> {{ docente.titulo if isinstance(docente, dict) else docente[6] }}</p>
+                            <p><strong>Legajo:</strong> {{ docente.legajo if isinstance(docente, dict) else docente[5] }}</p>
+                        </div>
+                    </div>
+
+                    <div class="badge-footer">
+                        <span><strong>DNI:</strong> {{ docente.dni if isinstance(docente, dict) else docente[4] }}</span>
+                        <span>SISTEMA QR</span>
+                    </div>
+                </div>
+                
+
+
+
+                <!-- DORSO DE LA CREDENCIAL -->
+                <div class="badge-back">
+                    <div style="text-align: center;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 1rem;">Instituciones Asignadas</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; text-align: left;">
+                            {% for esc in escuelas %}
+                            <li style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                🏫 {{ esc.escuela_nombre if isinstance(esc, dict) else esc[0] }}
+                            </li>
+                            {% else %}
+                            <li>Sin escuelas vinculadas</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; font-size: 0.75rem; opacity: 0.8;">
+                        Documento digital de identificación docente interno.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="flip-hint">👆 Haz clic sobre la tarjeta para ver el dorso</div>
+        <!-- Botón para descargar/imprimir -->
+<div style="text-align: center; margin-top: 15px;">
+    <button type="button" class="primary-btn" onclick="imprimirCredencial()" style="background: #10b981; display: inline-flex; align-items: center; gap: 8px;">
+        🖨️ Descargar / Imprimir Credencial (PDF)
+    </button>
+</div>
+    </div>
+
+    <!-- Columna Derecha: Formulario para Actualizar Datos y Foto -->
+    <div style="background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+        <h3 style="margin-top: 0; color: #1e293b;">✏️ Editar Información Personal</h3>
+        
+        <form action="/perfil" method="POST" enctype="multipart/form-data" class="auth-form" style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" value="{{ docente.nombre if isinstance(docente, dict) else docente[1] }}" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Apellido:</label>
+                    <input type="text" name="apellido" value="{{ docente.apellido if isinstance(docente, dict) else docente[2] }}" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>DNI:</label>
+                    <input type="text" name="dni" value="{{ docente.dni if isinstance(docente, dict) else docente[4] }}">
+                </div>
+                <div style="flex: 1;">
+                    <label>N° Legajo:</label>
+                    <input type="text" name="legajo" value="{{ docente.legajo if isinstance(docente, dict) else docente[5] }}">
+                </div>
+            </div>
+
+            <div>
+                <label>Título / Cargo:</label>
+                <input type="text" name="titulo" value="{{ docente.titulo if isinstance(docente, dict) else docente[6] }}">
+            </div>
+
+            <div>
+                <label>Actualizar Foto de Perfil:</label>
+                <input type="file" name="foto" accept="image/*" style="padding: 8px; border: 1px dashed #cbd5e1; width: 100%; border-radius: 8px;">
+            </div>
+
+            <button type="submit" class="primary-btn" style="margin-top: 10px;">
+                Guardar Cambios
+            </button>
+        </form>
+    </div>
+
+</div>
+<script>
+function imprimirCredencial() {
+    const container = document.getElementById('badgeContainer');
+    
+    // Si la tarjeta está girada (mostrando el dorso), la volvemos al frente antes de imprimir
+    if (container.classList.contains('flipped')) {
+        container.classList.remove('flipped');
+        setTimeout(() => {
+            window.print();
+        }, 300);
+    } else {
+        window.print();
+    }
+}
+</script>
+{% endblock %}

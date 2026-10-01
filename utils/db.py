@@ -231,6 +231,13 @@ def init_db():
         FOREIGN KEY(grado_id) REFERENCES grados(id) ON DELETE SET NULL
     )
     """)
+    # Asegurar campos adicionales para la credencial en la tabla docentes
+    cursor.execute("""
+        ALTER TABLE docentes ADD COLUMN IF NOT EXISTS foto TEXT DEFAULT '/static/uploads/default-avatar.png';
+        ALTER TABLE docentes ADD COLUMN IF NOT EXISTS dni TEXT;
+        ALTER TABLE docentes ADD COLUMN IF NOT EXISTS legajo TEXT;
+        ALTER TABLE docentes ADD COLUMN IF NOT EXISTS titulo TEXT DEFAULT 'Docente Nivel Primario';
+    """)
 
     conn.commit()
 
