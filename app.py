@@ -2021,7 +2021,8 @@ def perfil_docente():
 
     docente_id = session["docente_id"]
     conn = get_connection()
-    cursor = conn.cursor()
+    
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     if request.method == "POST":
         nombre = request.form.get("nombre")
@@ -2063,7 +2064,7 @@ def perfil_docente():
 
     # Obtener datos completos del docente
     cursor.execute("""
-        SELECT id, nombre, apellido, email, 
+        SELECT id, nombre, apellido, 
                COALESCE(dni, 'Sin registrar') as dni, 
                COALESCE(legajo, 'S/D') as legajo, 
                COALESCE(titulo, 'Docente') as titulo, 
