@@ -183,29 +183,22 @@
             <div class="badge-card">
                 
                 <!-- FRENTE DE LA CREDENCIAL -->
-                <div class="badge-front">
-                    <div class="badge-header">
-                        <span>Credencial Docente</span>
-                        <span style="color: #10b981;">● Activo</span>
-                    </div>
+                <div class="badge-body">
+    <img src="{{ docente.foto }}" 
+         onerror="this.src='https://ui-avatars.com/api/?name={{ docente.nombre }}+{{ docente.apellido }}&background=3b82f6&color=fff'" 
+         class="badge-photo" alt="Foto Docente">
+    
+    <div class="badge-info">
+        <h2>{{ docente.apellido }}, {{ docente.nombre }}</h2>
+        <p><strong>Cargo:</strong> {{ docente.titulo }}</p>
+        <p><strong>Legajo:</strong> {{ docente.legajo }}</p>
+    </div>
+</div>
 
-                    <div class="badge-body">
-                        <img src="{{ docente.foto if isinstance(docente, dict) else docente[7] }}" 
-                             onerror="this.src='https://ui-avatars.com/api/?name={{ docente.nombre if isinstance(docente, dict) else docente[1] }}+{{ docente.apellido if isinstance(docente, dict) else docente[2] }}&background=3b82f6&color=fff'" 
-                             class="badge-photo" alt="Foto Docente">
-                        
-                        <div class="badge-info">
-                            <h2>{{ (docente.apellido if isinstance(docente, dict) else docente[2]) }}, {{ (docente.nombre if isinstance(docente, dict) else docente[1]) }}</h2>
-                            <p><strong>Cargo:</strong> {{ docente.titulo if isinstance(docente, dict) else docente[6] }}</p>
-                            <p><strong>Legajo:</strong> {{ docente.legajo if isinstance(docente, dict) else docente[5] }}</p>
-                        </div>
-                    </div>
-
-                    <div class="badge-footer">
-                        <span><strong>DNI:</strong> {{ docente.dni if isinstance(docente, dict) else docente[4] }}</span>
-                        <span>SISTEMA QR</span>
-                    </div>
-                </div>
+<div class="badge-footer">
+    <span><strong>DNI:</strong> {{ docente.dni }}</span>
+    <span>SISTEMA QR</span>
+</div>
                 
 
 
@@ -215,14 +208,14 @@
                     <div style="text-align: center;">
                         <h3 style="margin: 0 0 10px 0; font-size: 1rem;">Instituciones Asignadas</h3>
                         <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; text-align: left;">
-                            {% for esc in escuelas %}
-                            <li style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                                🏫 {{ esc.escuela_nombre if isinstance(esc, dict) else esc[0] }}
-                            </li>
-                            {% else %}
-                            <li>Sin escuelas vinculadas</li>
-                            {% endfor %}
-                        </ul>
+    {% for esc in escuelas %}
+    <li style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+        🏫 {{ esc.escuela_nombre }}
+    </li>
+    {% else %}
+    <li>Sin escuelas vinculadas</li>
+    {% endfor %}
+</ul>
                     </div>
 
                     <div style="text-align: center; font-size: 0.75rem; opacity: 0.8;">
@@ -247,32 +240,32 @@
         
         <form action="/perfil" method="POST" enctype="multipart/form-data" class="auth-form" style="display: flex; flex-direction: column; gap: 14px;">
             
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>Nombre:</label>
-                    <input type="text" name="nombre" value="{{ docente.nombre if isinstance(docente, dict) else docente[1] }}" required>
-                </div>
-                <div style="flex: 1;">
-                    <label>Apellido:</label>
-                    <input type="text" name="apellido" value="{{ docente.apellido if isinstance(docente, dict) else docente[2] }}" required>
-                </div>
-            </div>
+           <div style="display: flex; gap: 10px;">
+    <div style="flex: 1;">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value="{{ docente.nombre }}" required>
+    </div>
+    <div style="flex: 1;">
+        <label>Apellido:</label>
+        <input type="text" name="apellido" value="{{ docente.apellido }}" required>
+    </div>
+</div>
 
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>DNI:</label>
-                    <input type="text" name="dni" value="{{ docente.dni if isinstance(docente, dict) else docente[4] }}">
-                </div>
-                <div style="flex: 1;">
-                    <label>N° Legajo:</label>
-                    <input type="text" name="legajo" value="{{ docente.legajo if isinstance(docente, dict) else docente[5] }}">
-                </div>
-            </div>
+<div style="display: flex; gap: 10px;">
+    <div style="flex: 1;">
+        <label>DNI:</label>
+        <input type="text" name="dni" value="{{ docente.dni }}">
+    </div>
+    <div style="flex: 1;">
+        <label>N° Legajo:</label>
+        <input type="text" name="legajo" value="{{ docente.legajo }}">
+    </div>
+</div>
 
-            <div>
-                <label>Título / Cargo:</label>
-                <input type="text" name="titulo" value="{{ docente.titulo if isinstance(docente, dict) else docente[6] }}">
-            </div>
+<div>
+    <label>Título / Cargo:</label>
+    <input type="text" name="titulo" value="{{ docente.titulo }}">
+</div>
 
             <div>
                 <label>Actualizar Foto de Perfil:</label>

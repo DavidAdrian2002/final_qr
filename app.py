@@ -2021,7 +2021,7 @@ def perfil_docente():
 
     docente_id = session["docente_id"]
     conn = get_connection()
-    
+    # Usamos RealDictCursor para obtener los resultados como diccionarios
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     if request.method == "POST":
@@ -2031,7 +2031,6 @@ def perfil_docente():
         legajo = request.form.get("legajo")
         titulo = request.form.get("titulo")
         
-        # Manejo de la foto de perfil
         foto_path = None
         if 'foto' in request.files:
             file = request.files['foto']
@@ -2041,7 +2040,6 @@ def perfil_docente():
                 file.save(filepath)
                 foto_path = f"/static/uploads/{filename}"
 
-        # Actualizar datos
         placeholder = "%s" if DATABASE_URL else "?"
         if foto_path:
             cursor.execute(f"""
@@ -2062,7 +2060,7 @@ def perfil_docente():
         flash("Perfil y credencial actualizados con éxito.", "success")
         return redirect("/perfil")
 
-    # Obtener datos completos del docente
+    # Consulta simplificada
     cursor.execute("""
         SELECT id, nombre, apellido, 
                COALESCE(dni, 'Sin registrar') as dni, 
@@ -2073,7 +2071,6 @@ def perfil_docente():
     """, (docente_id,))
     docente = cursor.fetchone()
 
-    # Obtener escuelas asociadas para el dorso de la credencial
     cursor.execute("""
         SELECT e.nombre as escuela_nombre 
         FROM escuelas e
@@ -2085,7 +2082,6 @@ def perfil_docente():
     conn.close()
 
     return render_template("perfil.html", docente=docente, escuelas=escuelas)
-    
 
 # =========================
 # SELECCIÓN Y FILTRO DE SEGUIMIENTO (Pantalla Previa)
