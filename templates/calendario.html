@@ -7,54 +7,201 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
-<div class="calendar-container" style="max-width: 1100px; margin: 0 auto; padding: 15px;">
+<style>
+  /* Estilos Responsivos y Pintorescos */
+  .cal-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    padding: 18px 20px;
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+  }
+
+  .cal-title-wrapper h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .cal-title-wrapper p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .btn-add-event {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .btn-add-event:hover {
+    background: white;
+    color: #4f46e5;
+  }
+
+  /* Leyenda de Colores */
+  .legend-card {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #e2e8f0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* Tarjeta contenedora del calendario */
+  .calendar-card {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Ajustes responsivos para dispositivos móviles */
+  @media (max-width: 640px) {
+    .cal-header-container {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .btn-add-event {
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .legend-card {
+      justify-content: space-around;
+      padding: 10px;
+    }
+
+    .fc .fc-toolbar {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .fc .fc-toolbar-title {
+      font-size: 1.1rem !important;
+    }
+
+    .fc .fc-button {
+      padding: 6px 10px !important;
+      font-size: 0.8rem !important;
+    }
+  }
+
+  /* Personalización de FullCalendar */
+  .fc-theme-standard td, .fc-theme-standard th {
+    border-color: #f1f5f9;
+  }
+  
+  .fc-event {
+    border-radius: 6px !important;
+    padding: 2px 4px !important;
+    font-size: 0.8rem !important;
+    cursor: pointer;
+  }
+</style>
+
+<div class="calendar-container" style="max-width: 1100px; margin: 0 auto; padding: 10px;">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-        <h1 class="page-title" style="margin: 0;">📅 Calendario y Agenda</h1>
-        <button type="button" class="primary-btn" onclick="document.getElementById('modalNuevoEvento').style.display='block'">
-            + Nuevo Recordatorio / Evento
+    <!-- Encabezado Estilizado -->
+    <div class="cal-header-container">
+        <div class="cal-title-wrapper">
+            <h1>📅 Mi Agenda Académica</h1>
+            <p>Consulta asistencias tomadas y programa tus recordatorios</p>
+        </div>
+        <button type="button" class="btn-add-event" onclick="document.getElementById('modalNuevoEvento').style.display='flex'">
+            + Nuevo Recordatorio
         </button>
     </div>
 
     <!-- Leyenda de colores -->
-    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-size: 0.9em;">
-        <span><strong style="color: #10b981;">●</strong> Asistencia tomada</span>
-        <span><strong style="color: #ef4444;">●</strong> Examen / Evaluación</span>
-        <span><strong style="color: #f59e0b;">●</strong> Reunión</span>
-        <span><strong style="color: #8b5cf6;">●</strong> Entrega de Informe</span>
-        <span><strong style="color: #3b82f6;">●</strong> Nota personal</span>
+    <div class="legend-card">
+        <div class="legend-item"><span class="legend-dot" style="background: #10b981;"></span> Asistencia tomada</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Examen</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span> Reunión</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #8b5cf6;"></span> Entrega de Informe</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #3b82f6;"></span> Nota personal</div>
     </div>
 
-    <!-- Contenedor del Calendario -->
-    <div id="calendar" style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"></div>
+    <!-- Calendario -->
+    <div class="calendar-card">
+        <div id="calendar"></div>
+    </div>
 </div>
 
-<!-- Modal para Agregar Nuevo Evento -->
-<div id="modalNuevoEvento" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 90%; margin: 10% auto;">
-        <h2>Agregar Nota o Evento</h2>
-        <form action="/calendario/nuevo_evento" method="POST" class="auth-form" style="display: flex; flex-direction: column; gap: 12px;">
-            
-            <label>Título:</label>
-            <input type="text" name="titulo" placeholder="Ej: Entrega de carpetas de 3° A" required>
+<!-- Modal Flotante para Agregar Evento -->
+<div id="modalNuevoEvento" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 15px;">
+    <div style="background: white; padding: 24px; border-radius: 20px; max-width: 440px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);">
+        <h2 style="margin-top: 0; font-size: 1.25rem; color: #1e293b;">📌 Agregar Nota / Recordatorio</h2>
+        
+        <form action="/calendario/nuevo_evento" method="POST" style="display: flex; flex-direction: column; gap: 14px; margin-top: 15px;">
+            <div>
+                <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Título</label>
+                <input type="text" name="titulo" placeholder="Ej: Entrega de carpetas de 3° A" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 4px;">
+            </div>
 
-            <label>Fecha:</label>
-            <input type="date" name="fecha" id="inputFecha" required>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Fecha</label>
+                    <input type="date" name="fecha" id="inputFecha" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 4px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Tipo</label>
+                    <select name="tipo" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 4px;">
+                        <option value="nota">🔵 Nota</option>
+                        <option value="examen">🔴 Examen</option>
+                        <option value="reunion">🟠 Reunión</option>
+                        <option value="informe">🟣 Informe</option>
+                    </select>
+                </div>
+            </div>
 
-            <label>Tipo de Evento:</label>
-            <select name="tipo">
-                <option value="nota">Nota Personal (Azul)</option>
-                <option value="examen">Examen / Evaluación (Rojo)</option>
-                <option value="reunion">Reunión de Padres / Docentes (Naranja)</option>
-                <option value="informe">Entrega de Informe (Púrpura)</option>
-            </select>
-
-            <label>Descripción / Observaciones (opcional):</label>
-            <textarea name="descripcion" rows="3" placeholder="Detalles o notas adicionales..."></textarea>
+            <div>
+                <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Observaciones (opcional)</label>
+                <textarea name="descripcion" rows="3" placeholder="Detalles o notas adicionales..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 4px;"></textarea>
+            </div>
 
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                <button type="button" style="background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('modalNuevoEvento').style.display='none'">Cancelar</button>
-                <button type="submit" class="primary-btn">Guardar</button>
+                <button type="button" style="background: #e2e8f0; color: #475569; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="document.getElementById('modalNuevoEvento').style.display='none'">Cancelar</button>
+                <button type="submit" style="background: #4f46e5; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
             </div>
         </form>
     </div>
@@ -64,33 +211,34 @@
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     
+    // Detecta si es un dispositivo móvil
+    var isMobile = window.innerWidth < 768;
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth',
+        initialView: isMobile ? 'listWeek' : 'dayGridMonth', // En celular entra directo en modo Lista semanal
         locale: 'es',
+        height: 'auto',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,dayGridWeek,listWeek'
+            right: isMobile ? 'listWeek,dayGridMonth' : 'dayGridMonth,dayGridWeek,listWeek'
         },
         buttonText: {
             today:    'Hoy',
             month:    'Mes',
             week:     'Semana',
-            list:     'Agenda'
+            list:     'Lista'
         },
         events: '/api/calendario/datos',
         dateClick: function(info) {
-            // Al hacer clic en un día vacío, abre el modal cargando esa fecha
             document.getElementById('inputFecha').value = info.dateStr;
-            document.getElementById('modalNuevoEvento').style.display = 'block';
+            document.getElementById('modalNuevoEvento').style.display = 'flex';
         },
         eventClick: function(info) {
-            // Si el evento tiene una URL (como la asistencia tomada), redirige directamente
             if (info.event.url) {
                 window.location.href = info.event.url;
                 info.jsEvent.preventDefault();
             } else {
-                // Si es un evento/nota personal, muestra los detalles y la opción de borrar
                 if (confirm('Evento: ' + info.event.title + '\n' + (info.event.extendedProps.description || '') + '\n\n¿Deseas eliminar este registro?')) {
                     var form = document.createElement('form');
                     form.method = 'POST';
