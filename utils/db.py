@@ -211,6 +211,26 @@ def init_db():
         FOREIGN KEY(docente_id) REFERENCES docentes(id)
     )
     """)
+    # =========================
+    # EVENTOS Y NOTAS DEL CALENDARIO
+    # =========================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS eventos_calendario (
+        id SERIAL PRIMARY KEY,
+        docente_id INTEGER NOT NULL,
+        escuela_id INTEGER,
+        grado_id INTEGER,
+        titulo TEXT NOT NULL,
+        descripcion TEXT,
+        fecha TEXT NOT NULL,          -- Formato YYYY-MM-DD
+        tipo TEXT DEFAULT 'nota',     -- 'examen', 'evento', 'reunion', 'informe', 'nota'
+        color TEXT DEFAULT '#3b82f6',  -- Para diferenciar visualmente en el calendario
+        fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(docente_id) REFERENCES docentes(id) ON DELETE CASCADE,
+        FOREIGN KEY(escuela_id) REFERENCES escuelas(id) ON DELETE SET NULL,
+        FOREIGN KEY(grado_id) REFERENCES grados(id) ON DELETE SET NULL
+    )
+    """)
 
     conn.commit()
 

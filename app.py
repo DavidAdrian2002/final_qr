@@ -31,6 +31,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Image
+from flask import jsonify
 from flask import (
     Flask,
     render_template,
@@ -1843,6 +1844,164 @@ def guardar_masivo():
 
     # Redirigir al listado de alumnos del grado correspondiente
     return redirect(f"/alumnos?grado_id={grado_id}")
+
+@app.route("/calendario")
+def vista_calendario():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Obtener escuelas para los filtros
+    cursor.execute("""
+        SELECT e.* FROM escuelas e
+        JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = %s
+    """, (docente_id,))
+    escuelas = cursor.fetchall()
+
+    # Obtener grados del docente
+    cursor.execute("""
+        SELECT g.*, e.nombre as escuela_nombre FROM grados g
+        JOIN escuelas e ON g.escuela_id = e.id
+        JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = %s
+    """, (docente_id,))
+    grados = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "calendario.html",
+        escuelas=escuelas,
+        grados=grados
+    )
+
+
+@app.route("/api/calendario/datos")
+def api_calendario_datos():
+    if "docente_id" not in session:
+        return jsonify({"error": "No autorizado"}), 401
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # 1. Obtener eventos y notas cargados por el docente
+    cursor.execute("""
+        SELECT id, titulo, descripcion, fecha, tipo, color 
+        FROM eventos_calendario 
+        WHERE docente_id = %s
+    """, (docente_id,))
+    eventos_db = cursor.fetchall()
+
+    eventos = []
+    for ev in eventos_db:
+        # Compatibilidad según si se usa dict o tuple en cursor
+        if isinstance(ev, dict):
+            eventos.append({
+                "id": ev["id"],
+                "title": ev["titulo"],
+                "start": ev["fecha"],
+                "description": ev["descripcion"],
+                "type": ev["tipo"],
+                "color": ev["color"] or "#3b82f6"
+            })
+        else:
+            eventos.append({
+                "id": ev[0],
+                "title": ev[1],
+                "start": ev[3],
+                "description": ev[2],
+                "type": ev[4],
+                "color": ev[5] or "#3b82f6"
+            })
+
+    # 2. Obtener los días únicos en los que se tomó asistencia
+    cursor.execute("""
+        SELECT DISTINCT a.fecha, g.nombre as grado_nombre
+        FROM asistencias a
+        JOIN grados g ON a.grado_id = g.id
+        JOIN escuelas e ON g.escuela_id = e.id
+        JOIN docente_escuelas de ON e.id = de.escuela_id
+        WHERE de.docente_id = %s
+    """, (docente_id,))
+    asistencias_db = cursor.fetchall()
+
+    for asis in asistencias_db:
+        fecha = asis["fecha"] if isinstance(asis, dict) else asis[0]
+        grado_nom = asis["grado_nombre"] if isinstance(asis, dict) else asis[1]
+        
+        eventos.append({
+            "id": f"asis-{fecha}",
+            "title": f"✓ Asistencia: {grado_nom}",
+            "start": fecha,
+            "color": "#10b981", # Color verde para indicar asistencia tomada
+            "url": f"/historial?fecha={fecha}",
+            "type": "asistencia"
+        })
+
+    conn.close()
+    return jsonify(eventos)
+
+
+@app.route("/calendario/nuevo_evento", methods=["POST"])
+def nuevo_evento_calendario():
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    titulo = request.form.get("titulo")
+    descripcion = request.form.get("descripcion")
+    fecha = request.form.get("fecha")
+    tipo = request.form.get("tipo", "nota")
+    
+    # Asignar color según el tipo
+    colores = {
+        "examen": "#ef4444",    # Rojo
+        "reunion": "#f59e0b",   # Naranja / Amarillo
+        "informe": "#8b5cf6",   # Púrpura
+        "nota": "#3b82f6"       # Azul
+    }
+    color = colores.get(tipo, "#3b82f6")
+
+    if titulo and fecha:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Inserción adaptable PostgreSQL / SQLite
+        placeholder = "%s" if DATABASE_URL else "?"
+        cursor.execute(f"""
+            INSERT INTO eventos_calendario (docente_id, titulo, descripcion, fecha, tipo, color)
+            VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
+        """, (docente_id, titulo, descripcion, fecha, tipo, color))
+        
+        conn.commit()
+        conn.close()
+        flash("Evento agregado al calendario.", "success")
+
+    return redirect("/calendario")
+
+
+@app.route("/calendario/eliminar_evento/<int:evento_id>", methods=["POST"])
+def eliminar_evento_calendario(evento_id):
+    if "docente_id" not in session:
+        return redirect("/login")
+
+    docente_id = session["docente_id"]
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    placeholder = "%s" if DATABASE_URL else "?"
+    cursor.execute(f"DELETE FROM eventos_calendario WHERE id = {placeholder} AND docente_id = {placeholder}", (evento_id, docente_id))
+    
+    conn.commit()
+    conn.close()
+    
+    flash("Evento eliminado del calendario.", "success")
+    return redirect("/calendario")
     
     
 

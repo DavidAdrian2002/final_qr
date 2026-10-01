@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario Académico{% endblock %}
+
+{% block content %}
+<!-- FullCalendar CSS y JS desde CDN -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+<div class="calendar-container" style="max-width: 1100px; margin: 0 auto; padding: 15px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+        <h1 class="page-title" style="margin: 0;">📅 Calendario y Agenda</h1>
+        <button type="button" class="primary-btn" onclick="document.getElementById('modalNuevoEvento').style.display='block'">
+            + Nuevo Recordatorio / Evento
+        </button>
+    </div>
+
+    <!-- Leyenda de colores -->
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-size: 0.9em;">
+        <span><strong style="color: #10b981;">●</strong> Asistencia tomada</span>
+        <span><strong style="color: #ef4444;">●</strong> Examen / Evaluación</span>
+        <span><strong style="color: #f59e0b;">●</strong> Reunión</span>
+        <span><strong style="color: #8b5cf6;">●</strong> Entrega de Informe</span>
+        <span><strong style="color: #3b82f6;">●</strong> Nota personal</span>
+    </div>
+
+    <!-- Contenedor del Calendario -->
+    <div id="calendar" style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"></div>
+</div>
+
+<!-- Modal para Agregar Nuevo Evento -->
+<div id="modalNuevoEvento" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 90%; margin: 10% auto;">
+        <h2>Agregar Nota o Evento</h2>
+        <form action="/calendario/nuevo_evento" method="POST" class="auth-form" style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <label>Título:</label>
+            <input type="text" name="titulo" placeholder="Ej: Entrega de carpetas de 3° A" required>
+
+            <label>Fecha:</label>
+            <input type="date" name="fecha" id="inputFecha" required>
+
+            <label>Tipo de Evento:</label>
+            <select name="tipo">
+                <option value="nota">Nota Personal (Azul)</option>
+                <option value="examen">Examen / Evaluación (Rojo)</option>
+                <option value="reunion">Reunión de Padres / Docentes (Naranja)</option>
+                <option value="informe">Entrega de Informe (Púrpura)</option>
+            </select>
+
+            <label>Descripción / Observaciones (opcional):</label>
+            <textarea name="descripcion" rows="3" placeholder="Detalles o notas adicionales..."></textarea>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button type="button" style="background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('modalNuevoEvento').style.display='none'">Cancelar</button>
+                <button type="submit" class="primary-btn">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: window.innerWidth < 768 ? 'dayGridWeek' : 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridWeek,listWeek'
+        },
+        buttonText: {
+            today:    'Hoy',
+            month:    'Mes',
+            week:     'Semana',
+            list:     'Agenda'
+        },
+        events: '/api/calendario/datos',
+        dateClick: function(info) {
+            // Al hacer clic en un día vacío, abre el modal cargando esa fecha
+            document.getElementById('inputFecha').value = info.dateStr;
+            document.getElementById('modalNuevoEvento').style.display = 'block';
+        },
+        eventClick: function(info) {
+            // Si el evento tiene una URL (como la asistencia tomada), redirige directamente
+            if (info.event.url) {
+                window.location.href = info.event.url;
+                info.jsEvent.preventDefault();
+            } else {
+                // Si es un evento/nota personal, muestra los detalles y la opción de borrar
+                if (confirm('Evento: ' + info.event.title + '\n' + (info.event.extendedProps.description || '') + '\n\n¿Deseas eliminar este registro?')) {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/calendario/eliminar_evento/' + info.event.id;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        }
+    });
+
+    calendar.render();
+});
+</script>
+{% endblock %}
